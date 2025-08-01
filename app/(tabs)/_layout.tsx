@@ -1,45 +1,51 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
-
-import { HapticTab } from '@/src/components/HapticTab';
-import { IconSymbol } from '@/src/components/ui/IconSymbol';
-import TabBarBackground from '@/src/components/ui/TabBarBackground';
-import { Colors } from '@/src/constants/Colors';
-import { useColorScheme } from '@/src/hooks/useColorScheme';
+import { Ionicons } from '@expo/vector-icons';
+import { Text } from 'react-native';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size }) => {
+          let iconName: keyof typeof Ionicons.glyphMap = 'home';
+
+          switch (route.name) {
+            case 'index':
+              iconName = 'home';
+              break;
+            case 'add-expense':
+              iconName = 'add-circle';
+              break;
+            case 'summary':
+              iconName = 'pie-chart';
+              break;
+            case 'groups':
+              iconName = 'folder';
+              break;
+            case 'profile':
+              iconName = 'person';
+              break;
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarLabel: ({ focused, color }) => {
+          switch (route.name) {
+            case 'index':
+              return <Text style={{ color }}>Home</Text>;
+            case 'add-expense':
+              return <Text style={{ color }}>Add</Text>;
+            case 'summary':
+              return <Text style={{ color }}>Summary</Text>;
+            case 'groups':
+              return <Text style={{ color }}>Groups</Text>;
+            case 'profile':
+              return <Text style={{ color }}>Profile</Text>;
+            default:
+              return null;
+          }
+        },
+      })}
+    />
   );
 }
