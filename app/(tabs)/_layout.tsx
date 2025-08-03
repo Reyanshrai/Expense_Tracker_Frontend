@@ -2,10 +2,11 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Text } from 'react-native';
 
-export default function TabLayout() {
+export default function Layout() {
   return (
     <Tabs
       screenOptions={({ route }) => ({
+        headerShown: false,
         tabBarIcon: ({ color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap = 'home';
 
@@ -29,12 +30,12 @@ export default function TabLayout() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarLabel: ({ focused, color }) => {
+        tabBarLabel: ({ color }) => {
           switch (route.name) {
             case 'index':
               return <Text style={{ color }}>Home</Text>;
             case 'add-expense':
-              return <Text style={{ color }}>Add</Text>;
+              return <Text style={{ color }}>Expense</Text>;
             case 'summary':
               return <Text style={{ color }}>Summary</Text>;
             case 'groups':
