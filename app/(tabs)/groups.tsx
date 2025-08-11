@@ -130,7 +130,7 @@ export default function GroupsScreen() {
     ? groups.filter(g => g.isActive)
     : groups.filter(g => !g.isActive);
 
-  const renderGroupItem = ({ item, index }) => (
+  const renderGroupItem = ({ item, index }: { item: any, index: number }) => (
     <Animated.View
       style={[
         {
@@ -184,7 +184,7 @@ export default function GroupsScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.avatarScroll}
             >
-              {item.avatars.map((avatar, idx) => (
+              {item.avatars.map((avatar: any, idx: number) => (
                 <View key={idx} style={[styles.avatar, { backgroundColor: `${item.color}15` }]}>
                   <Text style={styles.avatarEmoji}>{avatar}</Text>
                 </View>
@@ -215,7 +215,7 @@ export default function GroupsScreen() {
     </Animated.View>
   );
 
-  const renderQuickAction = ({ item }) => (
+  const renderQuickAction = ({ item }: { item: any }) => (
     <TouchableOpacity activeOpacity={0.8}>
       <BlurView intensity={15} tint={isDark ? "dark" : "light"} style={styles.quickActionCard}>
         <View style={[styles.quickActionIcon, { backgroundColor: `${item.color}20` }]}>
