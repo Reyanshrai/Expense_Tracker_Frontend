@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTheme } from "@/src/context/themeContext";
 import { lightColors, darkColors } from "@/src/utils/themeColors";
+import { styles } from '../../src/css/expense.styles';
 
 export default function AddExpenseScreen() {
   const [title, setTitle] = useState('');
@@ -62,22 +63,3 @@ export default function AddExpenseScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24 },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 24 },
-  input: {
-    padding: 14,
-    borderRadius: 10,
-    marginBottom: 16,
-    fontSize: 16,
-  },
-  button: {
-    padding: 14,
-    borderRadius: 12,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-  },
-  buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
-});
