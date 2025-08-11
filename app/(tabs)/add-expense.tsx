@@ -53,7 +53,7 @@ export default function AddExpenseScreen() {
     ]);
   };
 
-  const getInputStyle = (inputName) => [
+  const getInputStyle = (inputName: string) => [
     styles.input,
     {
       backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.9)',
