@@ -145,7 +145,7 @@ export default function LoginScreen() {
           </BlurView>
 
           {/* Form Section */}
-          <BlurView intensity={20} tint="light" style={styles.formContainer}>
+          <BlurView intensity={20} tint="light" style={styles.formContainer} pointerEvents="box-none">
             {/* Email Input */}
             <View style={styles.inputWrapper}>
               <View style={[
