@@ -1,0 +1,296 @@
+import { StyleSheet } from 'react-native';
+
+export const styles = StyleSheet.create({
+    container: { 
+      flex: 1,
+    },
+    backgroundGradient: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+    },
+    scrollContent: {
+      paddingBottom: 100,
+    },
+    header: {
+      paddingHorizontal: 20,
+      paddingTop: 60,
+      marginBottom: 24,
+    },
+    headerTitle: { 
+      fontSize: 32, 
+      fontWeight: '800',
+      letterSpacing: -1,
+      marginBottom: 4,
+    },
+    headerSubtitle: {
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    statsContainer: {
+      paddingHorizontal: 20,
+      marginBottom: 32,
+    },
+    statsCard: {
+      borderRadius: 24,
+      shadowColor: '#667eea',
+      shadowOffset: {
+        width: 0,
+        height: 12,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 20,
+      elevation: 15,
+    },
+    statsContent: {
+      padding: 24,
+      borderRadius: 24,
+    },
+    statsRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    statItem: {
+      alignItems: 'center',
+      flex: 1,
+    },
+    statValue: {
+      fontSize: 24,
+      fontWeight: '800',
+      color: '#fff',
+      marginBottom: 4,
+    },
+    statLabel: {
+      fontSize: 12,
+      color: 'rgba(255,255,255,0.8)',
+      fontWeight: '600',
+    },
+    statsDivider: {
+      width: 1,
+      height: 40,
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      marginHorizontal: 16,
+    },
+    quickActionsContainer: {
+      marginBottom: 32,
+    },
+    sectionTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      paddingHorizontal: 20,
+      marginBottom: 16,
+      letterSpacing: -0.5,
+    },
+    quickActionsList: {
+      paddingHorizontal: 16,
+    },
+    quickActionCard: {
+      alignItems: 'center',
+      padding: 16,
+      borderRadius: 16,
+      marginHorizontal: 4,
+      width: 100,
+      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+      borderWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    quickActionIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    quickActionText: {
+      fontSize: 12,
+      fontWeight: '600',
+      textAlign: 'center',
+    },
+    filterContainer: {
+      flexDirection: 'row',
+      paddingHorizontal: 20,
+      marginBottom: 24,
+    },
+    filterTab: {
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderRadius: 16,
+      marginRight: 12,
+      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+      borderWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    activeFilterTab: {
+      borderColor: '#667eea',
+      backgroundColor: 'rgba(102, 126, 234, 0.1)',
+    },
+    filterText: {
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    groupsContainer: {
+      paddingHorizontal: 20,
+    },
+    groupCardWrapper: {
+      marginBottom: 16,
+    },
+    groupCard: {
+      padding: 20,
+      borderRadius: 20,
+      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+      borderWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    groupHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: 16,
+    },
+    groupLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    groupIcon: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+      position: 'relative',
+    },
+    activeIndicator: {
+      position: 'absolute',
+      top: -2,
+      right: -2,
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      backgroundColor: '#4ECDC4',
+      borderWidth: 2,
+      borderColor: '#fff',
+    },
+    groupInfo: {
+      flex: 1,
+    },
+    groupName: { 
+      fontSize: 18, 
+      fontWeight: '700',
+      marginBottom: 4,
+      letterSpacing: -0.3,
+    },
+    groupMeta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    groupMembers: { 
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    separator: {
+      fontSize: 14,
+      marginHorizontal: 8,
+    },
+    recentActivity: {
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    groupRight: {
+      alignItems: 'flex-end',
+    },
+    totalSpent: {
+      fontSize: 18,
+      fontWeight: '800',
+      marginBottom: 4,
+    },
+    avatarContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    avatarScroll: {
+      paddingRight: 8,
+    },
+    avatar: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 8,
+      borderWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.2)',
+    },
+    avatarEmoji: {
+      fontSize: 16,
+    },
+    addMemberBtn: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 2,
+      borderColor: 'rgba(255, 255, 255, 0.3)',
+      borderStyle: 'dashed',
+    },
+    groupActions: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    actionBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      borderRadius: 12,
+      flex: 1,
+      marginHorizontal: 4,
+      justifyContent: 'center',
+    },
+    actionText: {
+      fontSize: 12,
+      fontWeight: '600',
+      marginLeft: 4,
+    },
+    createBtnContainer: {
+      position: 'absolute',
+      bottom: 30,
+      left: 20,
+      right: 20,
+    },
+    createBtn: {
+      borderRadius: 16,
+      shadowColor: '#FF6B6B',
+      shadowOffset: {
+        width: 0,
+        height: 8,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 16,
+      elevation: 8,
+    },
+    createBtnContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 18,
+      paddingHorizontal: 32,
+      borderRadius: 16,
+    },
+    createText: { 
+      color: '#fff', 
+      fontWeight: '700', 
+      fontSize: 16,
+      marginHorizontal: 8,
+    },
+    createEmoji: {
+      fontSize: 16,
+    },
+  });
