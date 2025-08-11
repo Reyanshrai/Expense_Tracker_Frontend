@@ -313,36 +313,6 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </Animated.View>
 
-      {/* Bottom Quick Actions */}
-      <BlurView intensity={20} tint={isDark ? "dark" : "light"} style={styles.quickActions}>
-        <TouchableOpacity style={styles.quickAction}>
-          <View style={[styles.quickActionIcon, { backgroundColor: '#FF6B6B20' }]}>
-            <Ionicons name="camera" size={20} color="#FF6B6B" />
-          </View>
-          <Text style={[styles.quickActionText, { color: colors.text }]}>Scan</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.quickAction}>
-          <View style={[styles.quickActionIcon, { backgroundColor: '#4ECDC420' }]}>
-            <Ionicons name="people" size={20} color="#4ECDC4" />
-          </View>
-          <Text style={[styles.quickActionText, { color: colors.text }]}>Split</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.quickAction}>
-          <View style={[styles.quickActionIcon, { backgroundColor: '#45B7D120' }]}>
-            <Ionicons name="analytics" size={20} color="#45B7D1" />
-          </View>
-          <Text style={[styles.quickActionText, { color: colors.text }]}>Stats</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.quickAction}>
-          <View style={[styles.quickActionIcon, { backgroundColor: '#A55EEA20' }]}>
-            <Ionicons name="settings" size={20} color="#A55EEA" />
-          </View>
-          <Text style={[styles.quickActionText, { color: colors.text }]}>More</Text>
-        </TouchableOpacity>
-      </BlurView>
     </View>
   );
 }
