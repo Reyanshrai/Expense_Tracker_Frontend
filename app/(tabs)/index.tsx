@@ -114,7 +114,7 @@ export default function HomeScreen() {
     outputRange: ['0deg', '360deg']
   });
 
-  const renderExpenseItem = ({ item, index }) => (
+  const renderExpenseItem = ({ item, index }: { item: any, index: number }) => (
     <Animated.View
       style={[
         {
@@ -149,7 +149,7 @@ export default function HomeScreen() {
     </Animated.View>
   );
 
-  const renderCategoryItem = ({ item }) => (
+  const renderCategoryItem = ({ item }: { item: any }) => (
     <TouchableOpacity activeOpacity={0.8}>
       <BlurView intensity={15} tint={isDark ? "dark" : "light"} style={styles.categoryCard}>
         <View style={[styles.categoryIcon, { backgroundColor: `${item.color}20` }]}>
