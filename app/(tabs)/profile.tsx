@@ -142,7 +142,7 @@ export default function ProfileScreen() {
     );
   };
 
-  const renderStatItem = ({ item }) => (
+  const renderStatItem = ({ item }: { item: any }) => (
     <BlurView intensity={20} tint={isDark ? "dark" : "light"} style={styles.statCard}>
       <View style={[styles.statIcon, { backgroundColor: `${item.color}20` }]}>
         <Ionicons name={item.icon} size={20} color={item.color} />
@@ -152,7 +152,7 @@ export default function ProfileScreen() {
     </BlurView>
   );
 
-  const renderMenuItem = (item, index) => (
+  const renderMenuItem = (item: any, index: number) => (
     <Animated.View
       key={item.id}
       style={[
