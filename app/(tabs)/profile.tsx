@@ -316,32 +316,6 @@ export default function ProfileScreen() {
           {menuItems.map((item, index) => renderMenuItem(item, index))}
         </Animated.View>
 
-        {/* Achievement Section */}
-        <Animated.View style={[
-          styles.achievementContainer,
-          {
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }]
-          }
-        ]}>
-          <BlurView intensity={20} tint={isDark ? "dark" : "light"} style={styles.achievementCard}>
-            <View style={styles.achievementHeader}>
-              <Text style={[styles.achievementTitle, { color: colors.text }]}>Latest Achievement 🏆</Text>
-              <TouchableOpacity>
-                <Text style={styles.viewAllText}>View All</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.achievementContent}>
-              <View style={styles.achievementIcon}>
-                <Text style={styles.achievementEmoji}>🎉</Text>
-              </View>
-              <View style={styles.achievementText}>
-                <Text style={[styles.achievementName, { color: colors.text }]}>First Split Master!</Text>
-                <Text style={[styles.achievementDesc, { color: colors.subtext }]}>Successfully split your first expense</Text>
-              </View>
-            </View>
-          </BlurView>
-        </Animated.View>
       </ScrollView>
 
       {/* Logout Button */}
