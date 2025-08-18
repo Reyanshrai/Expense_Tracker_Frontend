@@ -216,22 +216,7 @@ export default function AddExpenseScreen() {
             </View>
           </TouchableOpacity>
         </View>
-
-        {/* Quick Tips */}
-        <View style={[
-          styles.tipsContainer,
-          {
-            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
-            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'
-          }
-        ]}>
-          <Text style={[styles.tipsTitle, { color: colors.text }]}>💡 Quick Tip</Text>
-          <Text style={[styles.tipsText, { color: colors.subtext }]}>
-            Be specific with your expense titles to track your spending patterns better!
-          </Text>
-        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-
