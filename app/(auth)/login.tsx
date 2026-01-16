@@ -238,7 +238,7 @@ export default function LoginScreen() {
                   end={{ x: 1, y: 0 }}
                 >
                   <MaterialIcons name="login" size={24} color="white" />
-                  <Text style={styles.loginText}>Sign In</Text>
+                  <Text style={styles.loginText}>Log In</Text>
                   <Text style={styles.buttonEmoji}>✨</Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -265,7 +265,10 @@ export default function LoginScreen() {
               {/* Sign Up Link */}
               <View style={styles.signupContainer}>
                 <Text style={styles.signupText}>Don't have an account? </Text>
-                <TouchableOpacity activeOpacity={0.7}>
+                <TouchableOpacity 
+                activeOpacity={0.7}
+                onPress={() => router.push("/(auth)/signup")}
+                >
                   <Text style={styles.signupLink}>Sign up here! 🚀</Text>
                 </TouchableOpacity>
               </View>
