@@ -40,7 +40,7 @@ export default function OnboardingScreen() {
         <View style={styles.textContainer}>
           <Text style={styles.title}>
             Track Every{'\n'}
-            <Text style={styles.titleAccent}>Rupee</Text> ✨
+            <Text style={styles.titleAccent}>Rupees</Text> ✨
           </Text>
           <Text style={styles.subtitle}>
             Split, save, and share your expenses{'\n'}
