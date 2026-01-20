@@ -52,7 +52,7 @@ export default function OnboardingScreen() {
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
             style={styles.button} 
-            onPress={() => router.push('/(auth)/login')}
+            onPress={() => router.push('/(auth)/signup')}
             activeOpacity={0.8}
           >
             <LinearGradient
