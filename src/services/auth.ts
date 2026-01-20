@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider,signInWithPopup } from 'firebase/auth';
 import { auth } from './firebase';
 
 export const registerWithEmail = async (email:string,password:string,confirmPassword:string) =>{
@@ -37,5 +37,14 @@ export const logout = async () => {
         router.replace("/(auth)/login")
     }catch(error:any){
         throw new Error("Logout Failed")
+    }
+}
+
+export const loginWithGoogleWeb = async () =>{
+    const provider = new GoogleAuthProvider()
+    try{
+        await signInWithPopup(auth,provider)
+    }catch(error:any){
+        throw new Error("Login Failed")
     }
 }
