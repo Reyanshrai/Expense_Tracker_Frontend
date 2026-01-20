@@ -17,7 +17,7 @@ import {
   View
 } from "react-native";
 import { styles } from '../../src/css/login.styles';
-import { loginWithEmail, registerWithEmail } from "../../src/services/auth";
+import { loginWithGoogleWeb, registerWithEmail } from "../../src/services/auth";
 
 const { width, height } = Dimensions.get('window');
 
@@ -97,6 +97,17 @@ export default function LoginScreen() {
       Alert.alert("Registration Failed 😔", error.message)
     }
   };
+
+  /* Google login handle */
+
+  const handleGoogleLogin = async ()=>{
+    try{
+      await loginWithGoogleWeb()
+      router.replace("/(tabs)")
+    }catch(error:any){
+        Alert.alert("Google Login Failed", error.message)
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -277,7 +288,7 @@ export default function LoginScreen() {
               {/* Google Button */}
               <TouchableOpacity
                 style={styles.googleButton}
-                onPress={() => Alert.alert("Coming soon 🚧", "Google login will be added")}
+                onPress={handleGoogleLogin}
                 activeOpacity={0.8}
               >
                 <View style={styles.googleBlur}>
