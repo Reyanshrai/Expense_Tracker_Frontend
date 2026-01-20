@@ -17,7 +17,8 @@ import {
   View
 } from "react-native";
 import { styles } from '../../src/css/login.styles';
-import { loginWithEmail } from "../../src/services/auth";
+import { loginWithEmail,loginWithGoogleWeb } from "../../src/services/auth";
+import { replace } from "expo-router/build/global-state/routing";
 
 const { width, height } = Dimensions.get('window');
 
@@ -96,6 +97,17 @@ export default function LoginScreen() {
       Alert.alert("Login Failed 😔", error.message)
     }
   };
+
+  /*Google login Function */
+
+  const handleGoogleLogin = async()=>{
+    try{
+      await loginWithGoogleWeb()
+      router.replace("/(tabs)")
+    }catch(error:any){
+      Alert.alert("Google Login Failed", error.message)
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -253,7 +265,7 @@ export default function LoginScreen() {
               {/* Google Button */}
               <TouchableOpacity
                 style={styles.googleButton}
-                onPress={() => Alert.alert("Coming soon 🚧", "Google login will be added")}
+                onPress={handleGoogleLogin}
                 activeOpacity={0.8}
               >
                 <View style={styles.googleBlur}>
