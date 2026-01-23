@@ -18,6 +18,8 @@ import {
 } from "react-native";
 import { styles } from '../../src/css/login.styles';
 import { loginWithGoogleWeb, registerWithEmail } from "../../src/services/auth";
+import {createUserProfileIfNotExists} from '@/src/services/user'
+import {auth} from "@/src/services/firebase"
 
 const { width, height } = Dimensions.get('window');
 
@@ -91,10 +93,12 @@ export default function LoginScreen() {
     }
 
     try{
-      await registerWithEmail(email,password,confrimPassword)
+      const userCredentail = await registerWithEmail(email,password,confrimPassword)
+      await createUserProfileIfNotExists(userCredentail.user);
       router.replace("/(auth)/login")
     }catch(error:any){
-      Alert.alert("Registration Failed 😔", error.message)
+      console.error("SIGNUP ERROR:", error);
+      Alert.alert("Signup Failed 😔", error.message)
     }
   };
 
@@ -103,6 +107,7 @@ export default function LoginScreen() {
   const handleGoogleLogin = async ()=>{
     try{
       await loginWithGoogleWeb()
+      await createUserProfileIfNotExists(auth.currentUser!);
       router.replace("/(tabs)")
     }catch(error:any){
         Alert.alert("Google Login Failed", error.message)
