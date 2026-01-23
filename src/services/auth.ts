@@ -43,7 +43,7 @@ export const logout = async () => {
 export const loginWithGoogleWeb = async () =>{
     const provider = new GoogleAuthProvider()
     try{
-        await signInWithPopup(auth,provider)
+        return await signInWithPopup(auth,provider)
     }catch(error:any){
         throw new Error("Login Failed")
     }
