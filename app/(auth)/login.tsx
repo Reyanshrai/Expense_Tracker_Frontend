@@ -19,6 +19,8 @@ import {
 import { styles } from '../../src/css/login.styles';
 import { loginWithEmail,loginWithGoogleWeb } from "../../src/services/auth";
 import { replace } from "expo-router/build/global-state/routing";
+import {createUserProfileIfNotExists} from "@/src/services/user"
+import {auth} from "@/src/services/firebase"
 
 const { width, height } = Dimensions.get('window');
 
@@ -91,9 +93,13 @@ export default function LoginScreen() {
     }
 
     try{
-      await loginWithEmail(email,password)
-      router.replace("/(tabs)")
+      const cred = await loginWithEmail(email, password);
+      if (cred?.user) {
+        await createUserProfileIfNotExists(cred.user);
+        router.replace("/(tabs)");
+      }
     }catch(error:any){
+      console.error("LOGIN ERROR:", error);
       Alert.alert("Login Failed 😔", error.message)
     }
   };
@@ -102,7 +108,8 @@ export default function LoginScreen() {
 
   const handleGoogleLogin = async()=>{
     try{
-      await loginWithGoogleWeb()
+      const cred = await loginWithGoogleWeb();
+      await createUserProfileIfNotExists(cred.user);  
       router.replace("/(tabs)")
     }catch(error:any){
       Alert.alert("Google Login Failed", error.message)
