@@ -1,17 +1,25 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Slot } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from "@react-navigation/native";
+import { useFonts } from "expo-font";
+import { Slot } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import "react-native-reanimated";
 
-import { ThemeProvider as AppThemeProvider, useTheme } from '@/src/context/themeContext';
+import {
+  ThemeProvider as AppThemeProvider,
+  useTheme,
+} from "@/src/context/themeContext";
+import { AuthProvider } from "@/src/context/AuthContext";
 
 function LayoutWithTheme() {
   const { isDark } = useTheme();
 
   return (
     <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-      <Slot/>
+      <Slot />
       <StatusBar style="auto" />
     </ThemeProvider>
   );
@@ -19,14 +27,16 @@ function LayoutWithTheme() {
 
 export default function RootLayout() {
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
   if (!loaded) return null;
 
   return (
-    <AppThemeProvider>
-      <LayoutWithTheme />
-    </AppThemeProvider>
+    <AuthProvider>
+      <AppThemeProvider>
+        <LayoutWithTheme />
+      </AppThemeProvider>
+    </AuthProvider>
   );
 }
