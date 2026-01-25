@@ -18,6 +18,10 @@ import { lightColors, darkColors } from "@/src/utils/themeColors";
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { styles } from '../../src/css/profile.styles';
+import { useAuth } from "@/src/hooks/useAuth";
+import {logout} from '@/src/services/auth'
+import { auth } from "@/src/services/firebase";
+import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get('window');
 
@@ -82,6 +86,9 @@ const menuItems = [
 export default function ProfileScreen() {
   const { isDark, toggleTheme } = useTheme();
   const colors = isDark ? darkColors : lightColors;
+  const { user } = useAuth();
+  const router = useRouter()
+
   
   // Animation refs
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -128,18 +135,9 @@ export default function ProfileScreen() {
     ).start();
   }, []);
 
-  const handleLogout = () => {
-    Alert.alert(
-      'Logout 👋', 
-      'Are you sure you want to logout? We\'ll miss you! 🥺',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Logout', style: 'destructive', onPress: () => {
-          Alert.alert('Logged Out', 'See you soon! 👋✨');
-          // logic to clear session + redirect goes here
-        }}
-      ]
-    );
+  const handleLogout = async () => {
+    await logout()
+    router.replace("/(auth)/login")
   };
 
   const renderStatItem = ({ item }: { item: any }) => (
@@ -235,11 +233,11 @@ export default function ProfileScreen() {
                   </TouchableOpacity>
                 </Animated.View>
                 <View style={styles.profileInfo}>
-                  <Text style={styles.name}>Reyansh Revansh ✨</Text>
-                  <Text style={styles.email}>reyansh@email.com</Text>
+                  <Text style={styles.name}>{user?.displayName || "No Name"}</Text>
+                  <Text style={styles.email}>{user?.email}</Text>
                   <View style={styles.memberSince}>
                     <Ionicons name="calendar" size={14} color="rgba(255,255,255,0.8)" />
-                    <Text style={styles.memberText}>Member since Jan 2024</Text>
+                    <Text style={styles.memberText}>{user?.metadata.creationTime? new Date(user.metadata.creationTime).toLocaleDateString('en-IN'):""}</Text>
                   </View>
                 </View>
                 <TouchableOpacity style={styles.settingsBtn}>
