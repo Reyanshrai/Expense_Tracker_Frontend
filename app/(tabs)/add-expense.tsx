@@ -56,8 +56,12 @@ export default function AddExpenseScreen() {
       setAmount("");
       setSelectedCategory("");
 
-      Alert.alert("Expense Added ✅");
-      router.back();
+      Alert.alert("Expense Added ✅","Your expense has been saved!",[
+        {
+          text: "OK",
+           onPress: () => router.back(),
+        }
+      ]);
     } catch (error: any) {
       Alert.alert("Error", error.message);
     }
@@ -154,10 +158,14 @@ export default function AddExpenseScreen() {
                 placeholder="0"
                 placeholderTextColor={colors.subtext}
                 value={amount}
-                onChangeText={setAmount}
                 keyboardType="numeric"
                 onFocus={() => setFocusedInput("amount")}
                 onBlur={() => setFocusedInput("")}
+                onChangeText={(text) =>{
+                  // Allow only numbers and decimal points
+                  const numericText = text.replace(/[^0-9.]/g, "");
+                  setAmount(numericText);
+                }}
               />
             </View>
           </View>
