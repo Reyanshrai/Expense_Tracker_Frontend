@@ -23,7 +23,7 @@ import {auth} from "@/src/services/firebase"
 
 const { width, height } = Dimensions.get('window');
 
-export default function LoginScreen() {
+export default function SignScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,6 +31,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [isConfirmFocused, setIsConfirmFocused] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   
   // Animation values
@@ -140,14 +141,15 @@ export default function LoginScreen() {
       )}
       
       <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
         style={styles.keyboardContainer}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        keyboardVerticalOffset={80}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          keyboardDismissMode="none"
           bounces={false}
         >
           <Animated.View style={[
@@ -167,7 +169,7 @@ export default function LoginScreen() {
             </View>
 
             {/* Form Section */}
-            <View style={styles.formContainer}>
+            <View style={[styles.formContainer, {flex:1}]}>
               {/* Email Input */}
               <View style={styles.inputWrapper}>
                 <View style={[
@@ -245,8 +247,8 @@ export default function LoginScreen() {
                     secureTextEntry={!showPassword}
                     autoComplete="password"
                     textContentType="password"
-                    onFocus={() => setIsPasswordFocused(true)}
-                    onBlur={() => setIsPasswordFocused(false)}
+                    onFocus={() => setIsConfirmFocused(true)}
+                    onBlur={() => setIsConfirmFocused(false)}
                   />
                   <TouchableOpacity 
                     onPress={() => setShowPassword(!showPassword)}
