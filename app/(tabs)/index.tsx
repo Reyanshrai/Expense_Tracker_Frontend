@@ -21,6 +21,8 @@ import { listenUserExpenses } from "@/src/services/expense";
 import { useAuth } from "@/src/hooks/useAuth";
 import { onAuthStateChanged } from "firebase/auth";
 import { categoryMeta } from "@/src/utils/categoryMeta";
+import { calcCategoryStats } from "@/src/utils/calcCategoryStats";
+import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
@@ -30,6 +32,8 @@ export default function HomeScreen() {
   const colors = isDark ? darkColors : lightColors;
   const [expenses, setExpenses] = useState<any[]>([]);
   const [totalSpent, setTotalSpent] = useState(0);
+  const [categoryStats, setCategoryStats] = useState<any[]>([]);
+  const router = useRouter();
 
   // Animation refs
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -77,6 +81,9 @@ export default function HomeScreen() {
 
       const total = data.reduce((sum: number, e: any) => sum + e.amount, 0);
       setTotalSpent(total);
+
+      const stats = calcCategoryStats(data);
+      setCategoryStats(stats);
     });
 
     return unsub;
@@ -216,7 +223,7 @@ export default function HomeScreen() {
         >
           <View style={styles.headerLeft}>
             <Text style={[styles.helloText, { color: colors.subtext }]}>
-              Hey there! 👋
+              {user?.displayName || "Hey there"} 👋
             </Text>
             <Text style={[styles.nameText, { color: colors.text }]}>
               Ready to track today?
@@ -299,14 +306,14 @@ export default function HomeScreen() {
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
             Spending by Category 📈
           </Text>
-          {/* <FlatList
+          <FlatList
             data={categoryStats}
             renderItem={renderCategoryItem}
             keyExtractor={(item) => item.category}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.categoryList}
-          /> */}
+          />
         </Animated.View>
 
         {/* Recent Expenses */}
@@ -328,13 +335,26 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          <FlatList
-            data={expenses}
-            keyExtractor={(item) => item.id}
-            renderItem={renderExpenseItem}
-            showsVerticalScrollIndicator={false}
-            scrollEnabled={false}
-          />
+          {expenses.length === 0 ? (
+            <View style={{ alignItems: "center", marginTop: 30 }}>
+              <Ionicons
+                name="wallet-outline"
+                size={60}
+                color={colors.subtext}
+              />
+              <Text style={{ color: colors.subtext, marginTop: 10 }}>
+                No expenses yet. Tap + to add one.
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={expenses}
+              keyExtractor={(item) => item.id}
+              renderItem={renderExpenseItem}
+              showsVerticalScrollIndicator={false}
+              scrollEnabled={false}
+            />
+          )}
         </Animated.View>
       </ScrollView>
 
@@ -347,7 +367,10 @@ export default function HomeScreen() {
           },
         ]}
       >
-        <TouchableOpacity activeOpacity={0.8}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => router.push("/(tabs)/add-expense")}
+        >
           <LinearGradient
             colors={["#FF6B6B", "#FF8E53", "#FF6B9D"]}
             style={styles.fab}
