@@ -2,7 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../services/firebase";
 
-export const AuthContext = createContext<{
+export const authContext = createContext<{
   user: User | null;
   loading: boolean;
 }>({
@@ -24,8 +24,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <authContext.Provider value={{ user, loading }}>
       {children}
-    </AuthContext.Provider>
+    </authContext.Provider>
   );
 };
