@@ -8,11 +8,11 @@ import { Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
+import { AuthProvider } from "@/src/context/authContext";
 import {
   ThemeProvider as AppThemeProvider,
   useTheme,
 } from "@/src/context/themeContext";
-import { AuthProvider } from "@/src/context/AuthContext";
 
 function LayoutWithTheme() {
   const { isDark } = useTheme();
