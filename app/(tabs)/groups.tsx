@@ -1,83 +1,43 @@
-import { 
-  View, 
-  Text, 
-  FlatList, 
-  StyleSheet, 
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
   TouchableOpacity,
   Dimensions,
   StatusBar,
   Animated,
   ScrollView,
-} from 'react-native';
-import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
-import { useState, useRef, useEffect } from 'react';
+} from "react-native";
+import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
+import { useState, useRef, useEffect } from "react";
 import { useTheme } from "@/src/context/themeContext";
 import { lightColors, darkColors } from "@/src/utils/themeColors";
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
-import { styles } from '../../src/css/group.styles';
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
+import { styles } from "../../src/css/group.styles";
+import { useGroupsUI } from "@/src/hooks/useGroupsUI";
+import { createGroup } from "@/src/services/group";
+import { useContext } from "react";
+import { authContext } from "@/src/context/authContext";
+import CreateGroupModal from "@/src/components/groups/CreateGroupModal";
 
-const { width } = Dimensions.get('window');
-
-const dummyGroups = [
-  { 
-    id: '1', 
-    name: 'College Squad 🎓', 
-    members: 4,
-    totalSpent: 2450,
-    recentActivity: '2h ago',
-    color: '#FF6B6B',
-    icon: 'school',
-    avatars: ['👨‍🎓', '👩‍🎓', '👨‍💻', '👩‍🎨'],
-    isActive: true
-  },
-  { 
-    id: '2', 
-    name: 'Goa Vibes 🏖️', 
-    members: 3,
-    totalSpent: 15600,
-    recentActivity: '1d ago',
-    color: '#4ECDC4',
-    icon: 'airplane',
-    avatars: ['🏄‍♂️', '🏄‍♀️', '🌊'],
-    isActive: false
-  },
-  { 
-    id: '3', 
-    name: 'Startup Hustle 💼', 
-    members: 5,
-    totalSpent: 8900,
-    recentActivity: '5h ago',
-    color: '#45B7D1',
-    icon: 'bulb',
-    avatars: ['💻', '☕', '🚀', '💡', '📈'],
-    isActive: true
-  },
-  { 
-    id: '4', 
-    name: 'Foodie Gang 🍕', 
-    members: 6,
-    totalSpent: 3200,
-    recentActivity: '30m ago',
-    color: '#F7B731',
-    icon: 'restaurant',
-    avatars: ['🍕', '🍔', '🍜', '🥗', '🍰', '🍻'],
-    isActive: true
-  },
-];
+const { width } = Dimensions.get("window");
 
 const quickActions = [
-  { id: '1', title: 'Split Bill', icon: 'receipt', color: '#FF6B6B' },
-  { id: '2', title: 'Add Expense', icon: 'add-circle', color: '#4ECDC4' },
-  { id: '3', title: 'Settle Up', icon: 'checkmark-circle', color: '#45B7D1' },
-  { id: '4', title: 'View Stats', icon: 'stats-chart', color: '#A55EEA' },
+  { id: "1", title: "Split Bill", icon: "receipt", color: "#FF6B6B" },
+  { id: "2", title: "Add Expense", icon: "add-circle", color: "#4ECDC4" },
+  { id: "3", title: "Settle Up", icon: "checkmark-circle", color: "#45B7D1" },
+  { id: "4", title: "View Stats", icon: "stats-chart", color: "#A55EEA" },
 ];
 
 export default function GroupsScreen() {
-  const [groups, setGroups] = useState(dummyGroups);
-  const [selectedFilter, setSelectedFilter] = useState('all');
+  const { user } = useContext(authContext);
+  const { groups, loading } = useGroupsUI();
+  const [selectedFilter, setSelectedFilter] = useState("all");
   const { isDark } = useTheme();
   const colors = isDark ? darkColors : lightColors;
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Animation refs
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -120,50 +80,75 @@ export default function GroupsScreen() {
           duration: 1500,
           useNativeDriver: true,
         }),
-      ])
+      ]),
     ).start();
   }, []);
 
-  const filteredGroups = selectedFilter === 'all' 
-    ? groups 
-    : selectedFilter === 'active' 
-    ? groups.filter(g => g.isActive)
-    : groups.filter(g => !g.isActive);
+  const filteredGroups =
+    selectedFilter === "all"
+      ? groups
+      : selectedFilter === "active"
+        ? groups.filter((g) => g.isActive)
+        : groups.filter((g) => !g.isActive);
 
-  const renderGroupItem = ({ item, index }: { item: any, index: number }) => (
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading groups...</Text>
+      </View>
+    );
+  }
+
+  const renderGroupItem = ({ item, index }: { item: any; index: number }) => (
     <Animated.View
       style={[
         {
           opacity: fadeAnim,
-          transform: [
-            { translateY: slideAnim },
-            { scale: scaleAnim }
-          ]
-        }
+          transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+        },
       ]}
     >
       <TouchableOpacity activeOpacity={0.8} style={styles.groupCardWrapper}>
-        <BlurView intensity={20} tint={isDark ? "dark" : "light"} style={styles.groupCard}>
+        <BlurView
+          intensity={20}
+          tint={isDark ? "dark" : "light"}
+          style={styles.groupCard}
+        >
           {/* Group Header */}
           <View style={styles.groupHeader}>
             <View style={styles.groupLeft}>
-              <View style={[styles.groupIcon, { backgroundColor: `${item.color}20` }]}>
+              <View
+                style={[
+                  styles.groupIcon,
+                  { backgroundColor: `${item.color}20` },
+                ]}
+              >
                 <Ionicons name={item.icon} size={24} color={item.color} />
                 {item.isActive && (
-                  <Animated.View style={[
-                    styles.activeIndicator,
-                    { transform: [{ scale: pulseAnim }] }
-                  ]} />
+                  <Animated.View
+                    style={[
+                      styles.activeIndicator,
+                      { transform: [{ scale: pulseAnim }] },
+                    ]}
+                  />
                 )}
               </View>
               <View style={styles.groupInfo}>
-                <Text style={[styles.groupName, { color: colors.text }]}>{item.name}</Text>
+                <Text style={[styles.groupName, { color: colors.text }]}>
+                  {item.name}
+                </Text>
                 <View style={styles.groupMeta}>
-                  <Text style={[styles.groupMembers, { color: colors.subtext }]}>
+                  <Text
+                    style={[styles.groupMembers, { color: colors.subtext }]}
+                  >
                     {item.members} members
                   </Text>
-                  <Text style={[styles.separator, { color: colors.subtext }]}>•</Text>
-                  <Text style={[styles.recentActivity, { color: colors.subtext }]}>
+                  <Text style={[styles.separator, { color: colors.subtext }]}>
+                    •
+                  </Text>
+                  <Text
+                    style={[styles.recentActivity, { color: colors.subtext }]}
+                  >
                     {item.recentActivity}
                   </Text>
                 </View>
@@ -179,13 +164,19 @@ export default function GroupsScreen() {
 
           {/* Member Avatars */}
           <View style={styles.avatarContainer}>
-            <ScrollView 
-              horizontal 
+            <ScrollView
+              horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.avatarScroll}
             >
               {item.avatars.map((avatar: any, idx: number) => (
-                <View key={idx} style={[styles.avatar, { backgroundColor: `${item.color}15` }]}>
+                <View
+                  key={idx}
+                  style={[
+                    styles.avatar,
+                    { backgroundColor: `${item.color}15` },
+                  ]}
+                >
                   <Text style={styles.avatarEmoji}>{avatar}</Text>
                 </View>
               ))}
@@ -197,17 +188,29 @@ export default function GroupsScreen() {
 
           {/* Quick Actions for this group */}
           <View style={styles.groupActions}>
-            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: `${item.color}15` }]}>
+            <TouchableOpacity
+              style={[styles.actionBtn, { backgroundColor: `${item.color}15` }]}
+            >
               <Ionicons name="receipt" size={16} color={item.color} />
-              <Text style={[styles.actionText, { color: item.color }]}>Split</Text>
+              <Text style={[styles.actionText, { color: item.color }]}>
+                Split
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: `${item.color}15` }]}>
+            <TouchableOpacity
+              style={[styles.actionBtn, { backgroundColor: `${item.color}15` }]}
+            >
               <Ionicons name="add-circle" size={16} color={item.color} />
-              <Text style={[styles.actionText, { color: item.color }]}>Add</Text>
+              <Text style={[styles.actionText, { color: item.color }]}>
+                Add
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: `${item.color}15` }]}>
+            <TouchableOpacity
+              style={[styles.actionBtn, { backgroundColor: `${item.color}15` }]}
+            >
               <Ionicons name="checkmark-circle" size={16} color={item.color} />
-              <Text style={[styles.actionText, { color: item.color }]}>Settle</Text>
+              <Text style={[styles.actionText, { color: item.color }]}>
+                Settle
+              </Text>
             </TouchableOpacity>
           </View>
         </BlurView>
@@ -217,11 +220,22 @@ export default function GroupsScreen() {
 
   const renderQuickAction = ({ item }: { item: any }) => (
     <TouchableOpacity activeOpacity={0.8}>
-      <BlurView intensity={15} tint={isDark ? "dark" : "light"} style={styles.quickActionCard}>
-        <View style={[styles.quickActionIcon, { backgroundColor: `${item.color}20` }]}>
+      <BlurView
+        intensity={15}
+        tint={isDark ? "dark" : "light"}
+        style={styles.quickActionCard}
+      >
+        <View
+          style={[
+            styles.quickActionIcon,
+            { backgroundColor: `${item.color}20` },
+          ]}
+        >
           <Ionicons name={item.icon} size={24} color={item.color} />
         </View>
-        <Text style={[styles.quickActionText, { color: colors.text }]}>{item.title}</Text>
+        <Text style={[styles.quickActionText, { color: colors.text }]}>
+          {item.title}
+        </Text>
       </BlurView>
     </TouchableOpacity>
   );
@@ -229,46 +243,61 @@ export default function GroupsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
-      
+
       {/* Background Gradient */}
       <LinearGradient
-        colors={isDark 
-          ? ['rgba(102, 126, 234, 0.1)', 'rgba(118, 75, 162, 0.05)', 'transparent']
-          : ['rgba(102, 126, 234, 0.05)', 'rgba(118, 75, 162, 0.03)', 'transparent']
+        colors={
+          isDark
+            ? [
+                "rgba(102, 126, 234, 0.1)",
+                "rgba(118, 75, 162, 0.05)",
+                "transparent",
+              ]
+            : [
+                "rgba(102, 126, 234, 0.05)",
+                "rgba(118, 75, 162, 0.03)",
+                "transparent",
+              ]
         }
         style={styles.backgroundGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
 
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Header */}
-        <Animated.View style={[
-          styles.header,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }]
-          }
-        ]}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Your Groups 👥</Text>
+        <Animated.View
+          style={[
+            styles.header,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            Your Groups 👥
+          </Text>
           <Text style={[styles.headerSubtitle, { color: colors.subtext }]}>
             Manage your group expenses effortlessly
           </Text>
         </Animated.View>
 
         {/* Stats Overview */}
-        <Animated.View style={[
-          styles.statsContainer,
-          {
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }]
-          }
-        ]}>
+        <Animated.View
+          style={[
+            styles.statsContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ scale: scaleAnim }],
+            },
+          ]}
+        >
           <LinearGradient
-            colors={['#667eea', '#764ba2', '#f093fb']}
+            colors={["#667eea", "#764ba2", "#f093fb"]}
             style={styles.statsCard}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -299,14 +328,18 @@ export default function GroupsScreen() {
         </Animated.View>
 
         {/* Quick Actions */}
-        <Animated.View style={[
-          styles.quickActionsContainer,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }]
-          }
-        ]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Actions ⚡</Text>
+        <Animated.View
+          style={[
+            styles.quickActionsContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Quick Actions ⚡
+          </Text>
           <FlatList
             data={quickActions}
             renderItem={renderQuickAction}
@@ -318,35 +351,44 @@ export default function GroupsScreen() {
         </Animated.View>
 
         {/* Filter Tabs */}
-        <Animated.View style={[
-          styles.filterContainer,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }]
-          }
-        ]}>
-          {['all', 'active', 'inactive'].map((filter) => (
+        <Animated.View
+          style={[
+            styles.filterContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
+          {["all", "active", "inactive"].map((filter) => (
             <TouchableOpacity
               key={filter}
               onPress={() => setSelectedFilter(filter)}
               activeOpacity={0.8}
             >
-              <BlurView 
-                intensity={selectedFilter === filter ? 20 : 10} 
-                tint={isDark ? "dark" : "light"} 
+              <BlurView
+                intensity={selectedFilter === filter ? 20 : 10}
+                tint={isDark ? "dark" : "light"}
                 style={[
                   styles.filterTab,
-                  selectedFilter === filter && styles.activeFilterTab
+                  selectedFilter === filter && styles.activeFilterTab,
                 ]}
               >
-                <Text style={[
-                  styles.filterText,
-                  { color: selectedFilter === filter ? '#667eea' : colors.subtext }
-                ]}>
-                  {filter.charAt(0).toUpperCase() + filter.slice(1)} 
-                  {filter === 'all' && ` (${groups.length})`}
-                  {filter === 'active' && ` (${groups.filter(g => g.isActive).length})`}
-                  {filter === 'inactive' && ` (${groups.filter(g => !g.isActive).length})`}
+                <Text
+                  style={[
+                    styles.filterText,
+                    {
+                      color:
+                        selectedFilter === filter ? "#667eea" : colors.subtext,
+                    },
+                  ]}
+                >
+                  {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  {filter === "all" && ` (${groups.length})`}
+                  {filter === "active" &&
+                    ` (${groups.filter((g) => g.isActive).length})`}
+                  {filter === "inactive" &&
+                    ` (${groups.filter((g) => !g.isActive).length})`}
                 </Text>
               </BlurView>
             </TouchableOpacity>
@@ -354,13 +396,15 @@ export default function GroupsScreen() {
         </Animated.View>
 
         {/* Groups List */}
-        <Animated.View style={[
-          styles.groupsContainer,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }]
-          }
-        ]}>
+        <Animated.View
+          style={[
+            styles.groupsContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
           <FlatList
             data={filteredGroups}
             keyExtractor={(item) => item.id}
@@ -371,22 +415,42 @@ export default function GroupsScreen() {
         </Animated.View>
       </ScrollView>
 
+      <CreateGroupModal
+        visible={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={(name, members) => {
+          if (!user) return;
+          createGroup(user, name, members);
+        }}
+      />
+
       {/* Create New Group Button */}
-      <Animated.View style={[
-        styles.createBtnContainer,
-        {
-          opacity: fadeAnim,
-          transform: [{ scale: scaleAnim }]
-        }
-      ]}>
-        <TouchableOpacity activeOpacity={0.8}>
+      <Animated.View
+        style={[
+          styles.createBtnContainer,
+          {
+            opacity: fadeAnim,
+            transform: [{ scale: scaleAnim }],
+          },
+        ]}
+      >
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => {
+            setShowCreateModal(true);
+          }}
+        >
           <LinearGradient
-            colors={['#FF6B6B', '#FF8E53', '#FF6B9D']}
+            colors={["#FF6B6B", "#FF8E53", "#FF6B9D"]}
             style={styles.createBtn}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
-            <BlurView intensity={10} tint="light" style={styles.createBtnContent}>
+            <BlurView
+              intensity={10}
+              tint="light"
+              style={styles.createBtnContent}
+            >
               <Ionicons name="add-circle" size={24} color="#fff" />
               <Text style={styles.createText}>Create New Group</Text>
               <Text style={styles.createEmoji}>🚀</Text>
@@ -397,4 +461,3 @@ export default function GroupsScreen() {
     </View>
   );
 }
-
