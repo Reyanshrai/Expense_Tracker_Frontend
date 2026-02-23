@@ -74,6 +74,7 @@ export default function CreateGroupModal({
             placeholderTextColor={colors.subtext}
             value={groupName}
             onChangeText={setGroupName}
+            
             style={{
               marginTop: 16,
               padding: 12,
