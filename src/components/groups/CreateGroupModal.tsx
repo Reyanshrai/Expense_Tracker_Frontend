@@ -64,9 +64,20 @@ export default function CreateGroupModal({
             backgroundColor: colors.card,
           }}
         >
-          <Text style={{ fontSize: 20, color: colors.text }}>
-            Create Group
-          </Text>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontSize: 20, color: colors.text }}>
+              Create Group
+            </Text>
+            <TouchableOpacity onPress={onClose}>
+              <Ionicons name="close" size={24} color={colors.text} />
+            </TouchableOpacity>
+          </View>
 
           {/* Group Name */}
           <TextInput
@@ -100,7 +111,7 @@ export default function CreateGroupModal({
               }}
             />
             <TouchableOpacity onPress={addMember} style={{ marginLeft: 10 }}>
-              <Ionicons name="add-circle" size={36} color="#667eea" />
+              <Ionicons name="add-circle" size={36} color={colors.primary} />
             </TouchableOpacity>
           </View>
 
@@ -118,7 +129,7 @@ export default function CreateGroupModal({
               >
                 <Text style={{ color: colors.text }}>{item}</Text>
                 <TouchableOpacity onPress={() => removeMember(item)}>
-                  <Ionicons name="close" size={18} color="red" />
+                  <Ionicons name="close" size={18} color={colors.accent} />
                 </TouchableOpacity>
               </View>
             )}
@@ -131,10 +142,10 @@ export default function CreateGroupModal({
               marginTop: 20,
               padding: 14,
               borderRadius: 12,
-              backgroundColor: "#667eea",
+              backgroundColor: colors.primary,
             }}
           >
-            <Text style={{ color: "#fff", textAlign: "center" }}>
+            <Text style={{ color: colors.text, textAlign: "center" }}>
               Create Group
             </Text>
           </TouchableOpacity>
