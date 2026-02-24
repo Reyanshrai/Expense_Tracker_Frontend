@@ -5,6 +5,7 @@ import GroupQuickActions from "@/src/components/groups/GroupQuickActions";
 import GroupFilters from "@/src/components/groups/GroupFilters";
 import GroupList from "@/src/components/groups/GroupList";
 import GroupDetailScreen from "@/src/components/groups/GroupDetailScreen";
+import AddExpenseModal from "@/src/components/groups/AddExpenseModal";
 
 import { authContext } from "@/src/context/authContext";
 import { useTheme } from "@/src/context/themeContext";
@@ -36,7 +37,6 @@ export default function GroupsScreen() {
 
   // 📊 Data
   const { groups, loading } = useGroupsUI();
-  
 
   // 🎛 State
   const [selectedFilter, setSelectedFilter] = useState<
@@ -45,6 +45,7 @@ export default function GroupsScreen() {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<any | null>(null);
+  const [expenseGroup, setExpenseGroup] = useState<any | null>(null);
 
   // 🎨 Theme
   const { isDark } = useTheme();
@@ -84,7 +85,7 @@ export default function GroupsScreen() {
       return groups.filter((g) => g.totalSpent > 0);
     }
     return groups.filter((g) => g.totalSpent === 0);
-  }, [groups, selectedFilter]); 
+  }, [groups, selectedFilter]);
 
   // ⏳ Loading state
   if (loading) {
@@ -157,7 +158,8 @@ export default function GroupsScreen() {
           groups={filteredGroups}
           fadeAnim={fadeAnim}
           slideAnim={slideAnim}
-          // onSelectGroup={(group: any) => setSelectedGroup(group)}
+          onSelectGroup={(group: any) => setSelectedGroup(group)}
+          onAddExpense={(group: any) => setExpenseGroup(group)}
         />
       </ScrollView>
 
@@ -198,6 +200,15 @@ export default function GroupsScreen() {
           </LinearGradient>
         </TouchableOpacity>
       </Animated.View>
+
+      <AddExpenseModal
+        visible={!!expenseGroup}
+        onClose={() => setExpenseGroup(null)}
+        onSave={(title, amount) => {
+          console.log("ADD EXPENSE 👉", expenseGroup?.id, title, amount);
+          setExpenseGroup(null);
+        }}
+      />
     </View>
   );
 }
