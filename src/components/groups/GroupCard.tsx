@@ -8,9 +8,10 @@ import { styles } from "@/src/css/group.styles";
 type Props = {
   group: any;
   onPress: () => void;
+  onAddExpense?: (group: any) => void;
 };
 
-export default function GroupCard({ group, onPress }: Props) {
+export default function GroupCard({ group, onPress, onAddExpense }: Props) {
   const { isDark } = useTheme();
   const colors = isDark ? darkColors : lightColors;
 
@@ -118,6 +119,7 @@ export default function GroupCard({ group, onPress }: Props) {
               styles.actionBtn,
               { backgroundColor: `${group.color}15` },
             ]}
+            onPress={()=> onAddExpense?.(group)}
           >
             <Ionicons name="add-circle" size={16} color={group.color} />
             <Text style={[styles.actionText, { color: group.color }]}>
