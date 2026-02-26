@@ -1,11 +1,12 @@
-import CreateGroupModal from "@/src/components/groups/CreateGroupModal";
-import GroupHeader from "@/src/components/groups/GroupHeader";
-import GroupStats from "@/src/components/groups/GroupStats";
-import GroupQuickActions from "@/src/components/groups/GroupQuickActions";
-import GroupFilters from "@/src/components/groups/GroupFilters";
-import GroupList from "@/src/components/groups/GroupList";
-import GroupDetailScreen from "@/src/components/groups/GroupDetailScreen";
 import AddExpenseModal from "@/src/components/groups/AddExpenseModal";
+import CreateGroupModal from "@/src/components/groups/CreateGroupModal";
+import GroupDetailScreen from "@/src/components/groups/GroupDetailScreen";
+import GroupFilters from "@/src/components/groups/GroupFilters";
+import GroupHeader from "@/src/components/groups/GroupHeader";
+import GroupList from "@/src/components/groups/GroupList";
+import GroupQuickActions from "@/src/components/groups/GroupQuickActions";
+import GroupStats from "@/src/components/groups/GroupStats";
+import { addGroupExpense } from "@/src/services/groupExpense";
 
 import { authContext } from "@/src/context/authContext";
 import { useTheme } from "@/src/context/themeContext";
@@ -13,10 +14,10 @@ import { useGroupsUI } from "@/src/hooks/useGroupsUI";
 import { createGroup } from "@/src/services/group";
 import { darkColors, lightColors } from "@/src/utils/themeColors";
 
-import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
 
-import { useContext, useEffect, useRef, useState, useMemo } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -204,8 +205,11 @@ export default function GroupsScreen() {
       <AddExpenseModal
         visible={!!expenseGroup}
         onClose={() => setExpenseGroup(null)}
-        onSave={(title, amount) => {
-          console.log("ADD EXPENSE 👉", expenseGroup?.id, title, amount);
+        onSave={async (title, amount) => {
+          if (!user || !expenseGroup) return;
+
+          await addGroupExpense(user, expenseGroup.id, title, amount);
+          console.log("GROUP ID SAVED 👉", expenseGroup.id);
           setExpenseGroup(null);
         }}
       />
