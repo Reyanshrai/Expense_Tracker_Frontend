@@ -11,12 +11,16 @@ export function useGroupsUI() {
     id: group.id,
     name: group.name,
     members: group.members.length,
-    totalSpent: 0,              // 🔥 later from group expenses
-    recentActivity: "Just now",  // 🔥 later real timestamp
+
+    // Use Real Values
+    totalSpent: Number(group.totalSpent ?? 0),
+
+    recentActivity: "Just now", // 🔥 later real timestamp
     color: COLORS[index % COLORS.length],
     icon: ICONS[index % ICONS.length],
     avatars: AVATARS.slice(0, Math.min(group.members.length, 5)),
-    isActive: true,
+
+    isActive: Number(group.totalSpent ?? 0) > 0,
   }));
 
   return { groups: uiGroups, loading };
