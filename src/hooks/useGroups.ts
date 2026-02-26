@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from "react";
 import { authContext } from "@/src/context/authContext";
 import { listenUserGroups } from "@/src/services/group";
+import { useContext, useEffect, useState } from "react";
 
 export function useGroups() {
   const { user, loading: authLoading } = useContext(authContext);
