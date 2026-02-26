@@ -12,6 +12,7 @@ import { User } from "firebase/auth";
 export const createGroup = async (user: User, groupName: string,memberEmails: string[] = []) => {
   return await addDoc(collection(db, "groups"), {
     name: groupName,
+    totalSpent: 0, 
     createdBy: user.uid,
     members: [user.uid,],
     memberEmails,// 🔥 later resolve emails to UIDs
