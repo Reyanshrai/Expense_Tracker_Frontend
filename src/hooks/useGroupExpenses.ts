@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   collection,
   onSnapshot,
@@ -18,7 +18,7 @@ export function useGroupExpenses(groupId: string) {
     const q = query(
       collection(db, "groupExpenses"),
       where("groupId", "==", groupId),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "desc"),
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -26,7 +26,7 @@ export function useGroupExpenses(groupId: string) {
         snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        }))
+        })),
       );
       setLoading(false);
     });
@@ -34,5 +34,12 @@ export function useGroupExpenses(groupId: string) {
     return unsubscribe;
   }, [groupId]);
 
-  return { expenses, loading };
+  const totalSpent = useMemo(() => {
+    return expenses.reduce((sum, exp) => {
+      const amount = Number(exp.amount) || 0;
+      return sum + amount;
+    }, 0);
+  }, [expenses]);
+
+  return { expenses, loading, totalSpent };
 }
