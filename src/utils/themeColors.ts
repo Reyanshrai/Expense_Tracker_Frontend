@@ -6,6 +6,7 @@ export const lightColors = {
   accent: '#ff4444',
   primary: '#4CAF50',
   input: '#f9f9f9',
+  border: '#e0e0e0',
 };
 
 export const darkColors = {
@@ -16,4 +17,5 @@ export const darkColors = {
   accent: '#ff8888',
   primary: '#81C784',
   input: '#1a1a1a',
+  border: '#333333',
 };
