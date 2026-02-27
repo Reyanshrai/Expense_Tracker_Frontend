@@ -3,17 +3,17 @@ import { useState } from "react";
 import { useTheme } from "@/src/context/themeContext";
 import { darkColors, lightColors } from "@/src/utils/themeColors";
 
-type AddExpenseModalProps = {
+type addExpenseModalProps = {
   visible: boolean;
   onClose: () => void;
   onSave: (title: string, amount: number) => void;
 };
 
-export default function AddExpenseModal({
+export default function addExpenseModal({
   visible,
   onClose,
   onSave,
-}: AddExpenseModalProps) {
+}: addExpenseModalProps) {
   const { isDark } = useTheme();
   const colors = isDark ? darkColors : lightColors;
 
