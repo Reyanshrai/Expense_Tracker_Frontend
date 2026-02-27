@@ -16,16 +16,20 @@ export const addGroupExpense = async (
   amount: number
 ) => {
   // 1️⃣ Save group expense
+
+  const safeAmount = Number(amount);
+  if (!safeAmount || safeAmount <= 0) return;
+
   await addDoc(collection(db, "groupExpenses"), {
     groupId,
-    userId: user.uid,
     title,
-    amount,
+    userId: user.uid,
+    amount : safeAmount,
     createdAt: Timestamp.now(),
   });
 
   // 2️⃣ Update group total
   await updateDoc(doc(db, "groups", groupId), {
-    totalSpent: increment(amount),
+    totalSpent: increment(safeAmount),
   });
 };
