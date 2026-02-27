@@ -15,6 +15,7 @@ export default function GroupCard({ group, onPress, onAddExpense }: Props) {
   const { isDark } = useTheme();
   const colors = isDark ? darkColors : lightColors;
 
+
   return (
     <TouchableOpacity
       activeOpacity={0.85}
