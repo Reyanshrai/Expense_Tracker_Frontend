@@ -209,7 +209,6 @@ export default function GroupsScreen() {
           if (!user || !expenseGroup) return;
 
           await addGroupExpense(user, expenseGroup.id, title, amount);
-          console.log("GROUP ID SAVED 👉", expenseGroup.id);
           setExpenseGroup(null);
         }}
       />
