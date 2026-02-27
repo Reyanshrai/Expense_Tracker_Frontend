@@ -2,6 +2,7 @@ import { Animated, Text, View } from "react-native";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { styles } from "@/src/css/group.styles";
+import groups from "@/app/(tabs)/groups";
 
 type Group = {
   id: string;
@@ -22,6 +23,7 @@ export default function GroupStats({
   scaleAnim,
 }: Props) {
   return (
+
     <Animated.View
       style={[
         styles.statsContainer,
