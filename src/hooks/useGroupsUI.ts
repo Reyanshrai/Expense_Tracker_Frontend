@@ -7,21 +7,29 @@ const AVATARS = ["👨‍🎓", "👩‍🎓", "👨‍💻", "👩‍🎨", "�
 export function useGroupsUI() {
   const { groups, loading } = useGroups();
 
-  const uiGroups = groups.map((group, index) => ({
-    id: group.id,
-    name: group.name,
-    members: group.members.length,
+  const uiGroups = groups.map((group, index) => {
+    const memberCount =
+      (group.members?.length || 0) + (group.memberEmails?.length || 0);
 
-    // Use Real Values
-    totalSpent: Number(group.totalSpent ?? 0),
+    return {
+      id: group.id,
+      name: group.name,
 
-    recentActivity: "Just now", // 🔥 later real timestamp
-    color: COLORS[index % COLORS.length],
-    icon: ICONS[index % ICONS.length],
-    avatars: AVATARS.slice(0, Math.min(group.members.length, 5)),
+      // ✅ FIXED
+      members: memberCount,
 
-    isActive: Number(group.totalSpent ?? 0) > 0,
-  }));
+      totalSpent: Number(group.totalSpent ?? 0),
+      recentActivity: "Just now",
+
+      color: COLORS[index % COLORS.length],
+      icon: ICONS[index % ICONS.length],
+
+      // ✅ avatars based on total members
+      avatars: AVATARS.slice(0, Math.min(memberCount, 5)),
+
+      isActive: Number(group.totalSpent ?? 0) > 0,
+    };
+  });
 
   return { groups: uiGroups, loading };
 }
