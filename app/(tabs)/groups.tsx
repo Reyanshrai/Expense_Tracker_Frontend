@@ -6,7 +6,8 @@ import GroupHeader from "@/src/components/groups/GroupHeader";
 import GroupList from "@/src/components/groups/GroupList";
 import GroupQuickActions from "@/src/components/groups/GroupQuickActions";
 import GroupStats from "@/src/components/groups/GroupStats";
-import { addGroupExpense } from "@/src/services/groupExpense";
+import { addGroupExpense } from "@/src/services/addGroupExpense";
+import { useGroups } from "@/src/hooks/useGroups";
 
 import { authContext } from "@/src/context/authContext";
 import { useTheme } from "@/src/context/themeContext";
@@ -37,7 +38,9 @@ export default function GroupsScreen() {
   const { user } = useContext(authContext);
 
   // 📊 Data
-  const { groups, loading } = useGroupsUI();
+
+  const { groups: rawGroups } = useGroups();
+  const { groups: uiGroups, loading } = useGroupsUI();
 
   // 🎛 State
   const [selectedFilter, setSelectedFilter] = useState<
@@ -81,12 +84,12 @@ export default function GroupsScreen() {
 
   // 🔍 Filtering logic
   const filteredGroups = useMemo(() => {
-    if (selectedFilter === "all") return groups;
+    if (selectedFilter === "all") return uiGroups;
     if (selectedFilter === "active") {
-      return groups.filter((g) => g.totalSpent > 0);
+      return uiGroups.filter((g) => g.totalSpent > 0);
     }
-    return groups.filter((g) => g.totalSpent === 0);
-  }, [groups, selectedFilter]);
+    return uiGroups.filter((g) => g.totalSpent === 0);
+  }, [uiGroups, selectedFilter]);
 
   // ⏳ Loading state
   if (loading) {
@@ -139,7 +142,11 @@ export default function GroupsScreen() {
         <GroupHeader fadeAnim={fadeAnim} slideAnim={slideAnim} />
 
         {/* 📈 STATS */}
-        <GroupStats groups={groups} fadeAnim={fadeAnim} scaleAnim={scaleAnim} />
+        <GroupStats
+          groups={uiGroups.map(g => ({ ...g, members: g.participantsCount }))}
+          fadeAnim={fadeAnim}
+          scaleAnim={scaleAnim}
+        />
 
         {/* ⚡ QUICK ACTIONS */}
         <GroupQuickActions fadeAnim={fadeAnim} slideAnim={slideAnim} />
@@ -148,7 +155,7 @@ export default function GroupsScreen() {
         <GroupFilters
           selectedFilter={selectedFilter}
           setSelectedFilter={setSelectedFilter}
-          groups={groups}
+          groups={uiGroups}
           fadeAnim={fadeAnim}
           slideAnim={slideAnim}
           colors={colors}
@@ -170,7 +177,7 @@ export default function GroupsScreen() {
         onClose={() => setShowCreateModal(false)}
         onCreate={(name, members) => {
           if (!user) return;
-          createGroup(user, name, members);
+          createGroup(user, name, members.map(member => ({ name: member })));
         }}
       />
 
@@ -208,7 +215,20 @@ export default function GroupsScreen() {
         onSave={async (title, amount) => {
           if (!user || !expenseGroup) return;
 
-          await addGroupExpense(user, expenseGroup.id, title, amount);
+          const realGroup = rawGroups.find((g) => g.id === expenseGroup.id);
+
+          if (!realGroup) {
+            console.error("Group not found for expense:", expenseGroup.id);
+            return;
+          }
+
+          await addGroupExpense(user, {
+            id : expenseGroup.id,
+            participants : expenseGroup.participants
+          }, title, amount);
+
+          console.log("GROUP MEMBERS FINAL 👉", realGroup.participants);
+          console.log("IS ARRAY 👉", Array.isArray(realGroup.participants));
           setExpenseGroup(null);
         }}
       />
