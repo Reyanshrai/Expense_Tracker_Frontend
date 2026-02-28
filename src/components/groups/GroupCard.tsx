@@ -11,6 +11,8 @@ type Props = {
   onAddExpense?: (group: any) => void;
 };
 
+
+
 export default function GroupCard({ group, onPress, onAddExpense }: Props) {
   const { isDark } = useTheme();
   const colors = isDark ? darkColors : lightColors;
@@ -52,7 +54,7 @@ export default function GroupCard({ group, onPress, onAddExpense }: Props) {
                 <Text
                   style={[styles.groupMembers, { color: colors.subtext }]}
                 >
-                  {group.members} members
+                  {group.participantsCount} members
                 </Text>
 
                 <Text style={[styles.separator, { color: colors.subtext }]}>
