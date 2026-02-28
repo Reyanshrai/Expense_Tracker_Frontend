@@ -8,15 +8,11 @@ export function useGroupsUI() {
   const { groups, loading } = useGroups();
 
   const uiGroups = groups.map((group, index) => {
-    const memberCount =
-      (group.members?.length || 0) + (group.memberEmails?.length || 0);
-
     return {
       id: group.id,
       name: group.name,
 
-      // ✅ FIXED
-      members: memberCount,
+      participantsCount: group.participants?.length ?? 0,
 
       totalSpent: Number(group.totalSpent ?? 0),
       recentActivity: "Just now",
@@ -25,7 +21,7 @@ export function useGroupsUI() {
       icon: ICONS[index % ICONS.length],
 
       // ✅ avatars based on total members
-      avatars: AVATARS.slice(0, Math.min(memberCount, 5)),
+      avatars: AVATARS.slice(0, Math.min(group.participants?.length ?? 1, 5)),
 
       isActive: Number(group.totalSpent ?? 0) > 0,
     };
