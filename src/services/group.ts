@@ -8,14 +8,26 @@ import {
 } from "firebase/firestore";
 import { db } from "@/src/services/firebase";
 import { User } from "firebase/auth";
+import { use } from "react";
 
-export const createGroup = async (user: User, groupName: string,memberEmails: string[] = []) => {
+export const createGroup = async (
+  user: User, 
+  groupName: string,
+  participants: { name: string; email?: string }[]
+) => {
   return await addDoc(collection(db, "groups"), {
     name: groupName,
     totalSpent: 0, 
     createdBy: user.uid,
     members: [user.uid,],
-    memberEmails,// 🔥 later resolve emails to UIDs
+    participants : [
+      {
+        id : user.uid,
+        name : user.displayName || "Unknown",
+        email : user.email
+      },
+      ...participants
+    ],
     createdAt: Timestamp.now(),
   });
 };
