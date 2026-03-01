@@ -1,25 +1,25 @@
-export function calculatEqualSplit(amount: number, participants: any[]) {
-  console.log(
-    "PARTICIPANTS ARRAY 👉",
-    participants,
-    Array.isArray(participants),
-  );
+import { Participant } from "@/src/types/group";
 
-  console.log("PARTICIPANTS RAW 👉", participants);
-  console.log("TYPE 👉", typeof participants);
-  console.log("IS ARRAY 👉", Array.isArray(participants));
-
+export function calculatEqualSplit(
+  totalAmount: number,
+  participants: Participant[],
+) {
   if (!Array.isArray(participants) || participants.length === 0) {
     console.error("❌ Invalid participants array", participants);
     return [];
   }
 
-  const perPerson = amount / participants.length;
+  const perPerson = Number(totalAmount / participants.length).toFixed(2);
 
-  return participants.map((participant) => ({
-    name: participant.name,
-    email: participant.email,
-    userId: participant.id ?? null,
-    amount: perPerson,
-  }));
+  return participants.map((p) => {
+    if (!p.email) {
+      console.error("❌ Participant missing email", p);
+    }
+
+    return {
+      participantEmail: p.email, // ✅ REQUIRED
+      participantName: p.name, // optional (UI)
+      amount: perPerson,
+    };
+  });
 }
