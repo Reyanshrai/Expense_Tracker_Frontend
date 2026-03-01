@@ -143,7 +143,7 @@ export default function GroupsScreen() {
 
         {/* 📈 STATS */}
         <GroupStats
-          groups={uiGroups.map(g => ({ ...g, members: g.participantsCount }))}
+          groups={uiGroups.map((g) => ({ ...g, members: g.members }))}
           fadeAnim={fadeAnim}
           scaleAnim={scaleAnim}
         />
@@ -171,13 +171,17 @@ export default function GroupsScreen() {
         />
       </ScrollView>
 
-      {/* ➕ CREATE GROUP MODAL */}
+        {/* ➕ CREATE GROUP MODAL */}
       <CreateGroupModal
         visible={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreate={(name, members) => {
           if (!user) return;
-          createGroup(user, name, members.map(member => ({ name: member })));
+          createGroup(
+            user,
+            name,
+            members,
+          );
         }}
       />
 
@@ -222,13 +226,15 @@ export default function GroupsScreen() {
             return;
           }
 
-          await addGroupExpense(user, {
-            id : expenseGroup.id,
-            participants : expenseGroup.participants
-          }, title, amount);
-
-          console.log("GROUP MEMBERS FINAL 👉", realGroup.participants);
-          console.log("IS ARRAY 👉", Array.isArray(realGroup.participants));
+          await addGroupExpense(
+            user,
+            {
+              id: expenseGroup.id,
+              participants: expenseGroup.participants,
+            },
+            title,
+            amount,
+          );
           setExpenseGroup(null);
         }}
       />
