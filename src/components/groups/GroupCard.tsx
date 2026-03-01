@@ -9,11 +9,12 @@ type Props = {
   group: any;
   onPress: () => void;
   onAddExpense?: (group: any) => void;
+  onSplit: (group: any) => void;
 };
 
 
 
-export default function GroupCard({ group, onPress, onAddExpense }: Props) {
+export default function GroupCard({ group, onPress, onAddExpense, onSplit }: Props) {
   const { isDark } = useTheme();
   const colors = isDark ? darkColors : lightColors;
 
@@ -54,7 +55,7 @@ export default function GroupCard({ group, onPress, onAddExpense }: Props) {
                 <Text
                   style={[styles.groupMembers, { color: colors.subtext }]}
                 >
-                  {group.membersCount} members
+                  {group.participants.length} members
                 </Text>
 
                 <Text style={[styles.separator, { color: colors.subtext }]}>
@@ -110,6 +111,7 @@ export default function GroupCard({ group, onPress, onAddExpense }: Props) {
               styles.actionBtn,
               { backgroundColor: `${group.color}15` },
             ]}
+            onPress={()=> onSplit(group)}
           >
             <Ionicons name="receipt" size={16} color={group.color} />
             <Text style={[styles.actionText, { color: group.color }]}>
