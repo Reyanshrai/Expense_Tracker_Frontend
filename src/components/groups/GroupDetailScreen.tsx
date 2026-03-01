@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useTheme } from "@/src/context/themeContext";
 import { darkColors, lightColors } from "@/src/utils/themeColors";
 import { useGroupExpenses } from "@/src/hooks/useGroupExpenses";
+import { calculateBalances } from "@/src/utils/calculateBalances";
 
 export default function GroupDetailScreen({ group, onBack }: any) {
   const { isDark } = useTheme();
@@ -10,16 +11,21 @@ export default function GroupDetailScreen({ group, onBack }: any) {
 
   const { expenses, loading, totalSpent } = useGroupExpenses(group.id);
 
-  useEffect(() => {
-    
-  }, [expenses, loading]);
+  const balances = calculateBalances(expenses);
+  console.log("BALANCES 👉", balances);
 
+  useEffect(() => {}, [expenses, loading]);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      
       {/* 🔙 HEADER */}
-      <View style={{ padding: 16, borderBottomWidth: 1, borderColor: colors.border }}>
+      <View
+        style={{
+          padding: 16,
+          borderBottomWidth: 1,
+          borderColor: colors.border,
+        }}
+      >
         <TouchableOpacity onPress={onBack}>
           <Text style={{ color: colors.primary }}>← Back</Text>
         </TouchableOpacity>
