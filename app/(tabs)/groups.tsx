@@ -8,6 +8,8 @@ import GroupQuickActions from "@/src/components/groups/GroupQuickActions";
 import GroupStats from "@/src/components/groups/GroupStats";
 import { addGroupExpense } from "@/src/services/addGroupExpense";
 import { useGroups } from "@/src/hooks/useGroups";
+import SplitPreviewModal from "@/src/components/groups/SplitPreviewModal";
+import { calculateSettlements } from "@/src/utils/settlement";
 
 import { authContext } from "@/src/context/authContext";
 import { useTheme } from "@/src/context/themeContext";
@@ -50,6 +52,8 @@ export default function GroupsScreen() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<any | null>(null);
   const [expenseGroup, setExpenseGroup] = useState<any | null>(null);
+  const [splitGroup, setSplitGroup] = useState<any | null>(null);
+  const [settlements, setSettlements] = useState<any[]>([]);
 
   // 🎨 Theme
   const { isDark } = useTheme();
@@ -110,6 +114,18 @@ export default function GroupsScreen() {
     );
   }
 
+  const handleSplit = (group: any) => {
+    if (!group?.balances) {
+      console.warn("No balances found for group");
+      return;
+    }
+
+    const result = calculateSettlements(group.balances);
+
+    setSettlements(result);
+    setSplitGroup(group);
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
@@ -168,20 +184,17 @@ export default function GroupsScreen() {
           slideAnim={slideAnim}
           onSelectGroup={(group: any) => setSelectedGroup(group)}
           onAddExpense={(group: any) => setExpenseGroup(group)}
+          onSplit={(group: any) => setSplitGroup(group)}
         />
       </ScrollView>
 
-        {/* ➕ CREATE GROUP MODAL */}
+      {/* ➕ CREATE GROUP MODAL */}
       <CreateGroupModal
         visible={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreate={(name, members) => {
           if (!user) return;
-          createGroup(
-            user,
-            name,
-            members,
-          );
+          createGroup(user, name, members);
         }}
       />
 
@@ -236,6 +249,15 @@ export default function GroupsScreen() {
             amount,
           );
           setExpenseGroup(null);
+        }}
+      />
+
+      <SplitPreviewModal
+        visible={!!splitGroup}
+        group={splitGroup}
+        onClose={() => {
+          setSplitGroup(null);
+          setSettlements([]);
         }}
       />
     </View>
