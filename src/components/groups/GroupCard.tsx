@@ -54,7 +54,7 @@ export default function GroupCard({ group, onPress, onAddExpense }: Props) {
                 <Text
                   style={[styles.groupMembers, { color: colors.subtext }]}
                 >
-                  {group.participantsCount} members
+                  {group.membersCount} members
                 </Text>
 
                 <Text style={[styles.separator, { color: colors.subtext }]}>
