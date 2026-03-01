@@ -9,31 +9,32 @@ import {
 import { db } from "./firebase";
 import { User } from "firebase/auth";
 import { calculatEqualSplit } from "@/src/utils/split";
+import { Participant } from "@/src/types/group";
 
 export const addGroupExpense = async (
   user: User,
-  group: any,
+  group: { id: string; participants: Participant[] },
   title: string,
   amount: number
 ) => {
-  // 1️⃣ Save group expense
 
-  const safeAmount = Number(amount);
-  if (!safeAmount || safeAmount <= 0) return;
 
-  console.log("ADD EXPENSE → GROUP MEMBERS:", group.members);
-console.log("IS ARRAY:", Array.isArray(group.members));
+  if(!Array.isArray(group.participants) || group.participants.length === 0) {
+    console.error("Group has no participants or participants is not an array:", group.participants);
+    return;
+  }
+
 
   const splits = calculatEqualSplit(
-    safeAmount,
+    amount,
     group.participants
   );
 
   await addDoc(collection(db, "groupExpenses"), {
     groupId : group.id,
     title,
-    amount : safeAmount,
-    paidBy : user.uid,
+    amount,
+    paidByEmail : user.email!,
     splitType : "equal",
     splits,
     createdAt: Timestamp.now(),
@@ -41,6 +42,6 @@ console.log("IS ARRAY:", Array.isArray(group.members));
 
   // 2️⃣ Update group total
   await updateDoc(doc(db, "groups", group.id), {
-    totalSpent: increment(safeAmount),
+    totalSpent: increment(amount),
   });
 };
