@@ -4,15 +4,18 @@ import { useTheme } from "@/src/context/themeContext";
 import { darkColors, lightColors } from "@/src/utils/themeColors";
 import { useGroupExpenses } from "@/src/hooks/useGroupExpenses";
 import { calculateBalances } from "@/src/utils/calculateBalances";
+import { calculateSettlements } from "@/src/utils/settlement";
 
 export default function GroupDetailScreen({ group, onBack }: any) {
   const { isDark } = useTheme();
   const colors = isDark ? darkColors : lightColors;
 
   const { expenses, loading, totalSpent } = useGroupExpenses(group.id);
-
   const balances = calculateBalances(expenses);
-  console.log("BALANCES 👉", balances);
+  const settlements = calculateSettlements(balances);
+
+  // console.log("BALANCES 👉", balances);
+  // console.log("SETTLEMENTS 👉", settlements);
 
   useEffect(() => {}, [expenses, loading]);
 
