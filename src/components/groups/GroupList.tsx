@@ -8,6 +8,7 @@ export default function GroupList({
   slideAnim,
   onSelectGroup,
   onAddExpense,
+  onSplit,
 }: any) {
   return (
     <Animated.View
@@ -21,8 +22,11 @@ export default function GroupList({
         extraData={groups} // ⭐ THIS IS THE FIX
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <GroupCard group={item} onPress={() => onSelectGroup(item)} 
+          <GroupCard
+           group={item}
+            onPress={() => onSelectGroup(item)} 
            onAddExpense={onAddExpense}
+           onSplit={onSplit}
           />
         )}
         showsVerticalScrollIndicator={false}
