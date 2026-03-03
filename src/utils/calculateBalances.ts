@@ -9,8 +9,13 @@ type Expense = {
   splits: Split[];
 };
 
-export const calculateBalances = (expenses: Expense[]) => {
+export const calculateBalances = (
+  expenses: Expense[],
+  settlements: any[] = [],
+) => {
   const balances: Record<string, number> = {};
+
+  // 1️⃣ Calculate net balance for each participant
 
   expenses.forEach((expense) => {
     // 1️⃣ Add paid amount
@@ -22,6 +27,13 @@ export const calculateBalances = (expenses: Expense[]) => {
       balances[split.participantEmail] =
         (balances[split.participantEmail] || 0) - split.amount;
     });
+  });
+
+  // 2️⃣ Adjust balances based on settlements
+
+  settlements.forEach((s) => {
+    balances[s.from] -= s.amount;
+    balances[s.to] += s.amount;
   });
 
   return balances;
