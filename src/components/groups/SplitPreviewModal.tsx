@@ -4,6 +4,8 @@ import { darkColors, lightColors } from "@/src/utils/themeColors";
 import { useGroupExpenses } from "@/src/hooks/useGroupExpenses";
 import { calculateBalances } from "@/src/utils/calculateBalances";
 import { calculateSettlements } from "@/src/utils/settlement";
+import { addSettlement } from "@/src/services/addSettlement";
+import { useState } from "react";
 
 type Props = {
   visible: boolean;
@@ -11,13 +13,10 @@ type Props = {
   onClose: () => void;
 };
 
-export default function SplitPreviewModal({
-  visible,
-  group,
-  onClose,
-}: Props) {
+export default function SplitPreviewModal({ visible, group, onClose }: Props) {
   const { isDark } = useTheme();
   const colors = isDark ? darkColors : lightColors;
+  const [payMode, setPayMode] = useState<"cash" | "upi">("cash");
 
   const { expenses, loading } = useGroupExpenses(group?.id);
 
@@ -58,9 +57,7 @@ export default function SplitPreviewModal({
 
           {/* LOADING */}
           {loading && (
-            <Text style={{ color: colors.subtext }}>
-              Calculating split...
-            </Text>
+            <Text style={{ color: colors.subtext }}>Calculating split...</Text>
           )}
 
           {/* EMPTY */}
@@ -100,6 +97,41 @@ export default function SplitPreviewModal({
             )}
           />
 
+          <View style={{ flexDirection: "row", marginVertical: 12 }}>
+            <TouchableOpacity
+              onPress={() => setPayMode("cash")}
+              style={{
+                flex: 1,
+                padding: 10,
+                borderRadius: 10,
+                backgroundColor: payMode === "cash" ? "#4ECDC4" : colors.border,
+                marginRight: 8,
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{ color: payMode === "cash" ? "#fff" : colors.text }}
+              >
+                Cash
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setPayMode("upi")}
+              style={{
+                flex: 1,
+                padding: 10,
+                borderRadius: 10,
+                backgroundColor: payMode === "upi" ? "#4ECDC4" : colors.border,
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: payMode === "upi" ? "#fff" : colors.text }}>
+                UPI
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           {/* FOOTER */}
           <TouchableOpacity
             style={{
@@ -109,10 +141,18 @@ export default function SplitPreviewModal({
               alignItems: "center",
               marginTop: 10,
             }}
+            onPress={async () => {
+              for (const s of settlements) {
+                await addSettlement({
+                  ...s,
+                  groupId: group.id,
+                  payMode,
+                });
+              }
+              onClose();
+            }}
           >
-            <Text style={{ color: "#fff", fontWeight: "600" }}>
-              Settle
-            </Text>
+            <Text style={{ color: "#fff", fontWeight: "600" }}>Settle</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
