@@ -1,26 +1,94 @@
-import { useEffect, useState } from "react";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/src/services/firebase";
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
+import { useEffect, useState } from "react";
 
-export function useGroupSettlements(groupId: string) {
-  const [settlements, setSettlements] = useState<any[]>([]);
+export type Settlement = {
+  id: string;
+  groupId: string;
+  from: string; // email
+  to: string; // email
+  fromName?: string; // display name
+  toName?: string; // display name
+  amount: number;
+  payMode: "cash" | "upi";
+  settledAt: any;
+};
+
+export function useGroupSettlements(groupId: string | undefined) {
+  const [settlements, setSettlements] = useState<Settlement[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!groupId) return;
+    if (!groupId) {
+      setSettlements([]);
+      setLoading(false);
+      return;
+    }
 
+    setLoading(true);
+
+    // Note: This query requires a Firestore composite index:
+    // Collection: groupSettlements, Fields: groupId (Ascending), settledAt (Descending)
     const q = query(
       collection(db, "groupSettlements"),
-      where("groupId", "==", groupId)
+      where("groupId", "==", groupId),
+      orderBy("settledAt", "desc"),
     );
 
-    const unsub = onSnapshot(q, (snap) => {
-      setSettlements(
-        snap.docs.map((d) => ({ id: d.id, ...d.data() }))
-      );
+    // Test query without orderBy to check if data exists
+    const qTest = query(
+      collection(db, "groupSettlements"),
+      where("groupId", "==", groupId),
+    );
+    onSnapshot(qTest, (testSnap) => {
+      console.log("🧪 TEST QUERY (no orderBy) count:", testSnap.docs.length);
+      testSnap.docs.forEach((doc) => {
+        console.log("🧪 TEST DOC:", doc.id, doc.data());
+      });
     });
 
-    return unsub;
+    console.log("📡 Fetching settlements for groupId:", groupId);
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        console.log("📥 Settlement snapshot received, count:", snapshot.docs.length);
+        console.log("📥 Query:", q);
+        console.log("📥 Collection path:", collection(db, "groupSettlements").path);
+        const data: Settlement[] = snapshot.docs.map((doc) => {
+          const docData = doc.data();
+          console.log("📄 Settlement doc:", doc.id, docData);
+          return {
+            id: doc.id,
+            ...(docData as Omit<Settlement, "id">),
+          };
+        });
+        console.log("✅ Processed settlements:", data);
+        setSettlements(data);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("❌ Error fetching settlements:", error.message);
+        console.error("Full error:", JSON.stringify(error, null, 2));
+        console.error("Error code:", error.code);
+        console.error("Error name:", error.name);
+        if (error.message?.includes("index") || error.code === "failed-precondition") {
+          console.error("🔥 FIRESTORE INDEX REQUIRED!");
+          console.error("Create index at: https://console.firebase.google.com/project/_/firestore/indexes");
+          console.error("Collection: groupSettlements, Fields: groupId (Ascending), settledAt (Descending)");
+        }
+        setLoading(false);
+      },
+    );
+
+    return () => unsubscribe();
   }, [groupId]);
 
-  return settlements;
+  return { settlements, loading };
 }
