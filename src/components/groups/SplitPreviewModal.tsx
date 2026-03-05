@@ -1,11 +1,12 @@
-import { Modal, View, Text, TouchableOpacity, FlatList } from "react-native";
 import { useTheme } from "@/src/context/themeContext";
-import { darkColors, lightColors } from "@/src/utils/themeColors";
 import { useGroupExpenses } from "@/src/hooks/useGroupExpenses";
+import { addSettlement } from "@/src/services/addSettlement";
+import { updateGroupStatus } from "@/src/services/group";
 import { calculateBalances } from "@/src/utils/calculateBalances";
 import { calculateSettlements } from "@/src/utils/settlement";
-import { addSettlement } from "@/src/services/addSettlement";
+import { darkColors, lightColors } from "@/src/utils/themeColors";
 import { useState } from "react";
+import { FlatList, Modal, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
   visible: boolean;
@@ -71,7 +72,14 @@ export default function SplitPreviewModal({ visible, group, onClose }: Props) {
           <FlatList
             data={settlements}
             keyExtractor={(_, i) => i.toString()}
-            renderItem={({ item }) => (
+            renderItem={({ item }) => {
+              // Get names from group participants
+              const fromParticipant = group.participants?.find((p: any) => p.email === item.from);
+              const toParticipant = group.participants?.find((p: any) => p.email === item.to);
+              const fromName = fromParticipant?.name || item.from;
+              const toName = toParticipant?.name || item.to;
+              
+              return (
               <View
                 style={{
                   padding: 12,
@@ -81,7 +89,7 @@ export default function SplitPreviewModal({ visible, group, onClose }: Props) {
                 }}
               >
                 <Text style={{ color: colors.text }}>
-                  {item.from} → {item.to}
+                  {fromName} → {toName}
                 </Text>
 
                 <Text
@@ -94,7 +102,7 @@ export default function SplitPreviewModal({ visible, group, onClose }: Props) {
                   ₹{item.amount}
                 </Text>
               </View>
-            )}
+            );}}
           />
 
           <View style={{ flexDirection: "row", marginVertical: 12 }}>
@@ -132,28 +140,59 @@ export default function SplitPreviewModal({ visible, group, onClose }: Props) {
             </TouchableOpacity>
           </View>
 
-          {/* FOOTER */}
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#4ECDC4",
-              padding: 14,
-              borderRadius: 12,
-              alignItems: "center",
-              marginTop: 10,
-            }}
-            onPress={async () => {
-              for (const s of settlements) {
-                await addSettlement({
-                  ...s,
-                  groupId: group.id,
-                  payMode,
-                });
-              }
-              onClose();
-            }}
-          >
-            <Text style={{ color: "#fff", fontWeight: "600" }}>Settle</Text>
-          </TouchableOpacity>
+          {/* FOOTER - Settlement Button */}
+          {group.status === "completed" ? (
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#4ECDC4",
+                padding: 14,
+                borderRadius: 12,
+                alignItems: "center",
+                marginTop: 10,
+              }}
+              onPress={async () => {
+                // Create a map of email to name from group participants
+                const emailToName = new Map<string, string>(
+                  group.participants?.map((p: any) => [p.email, p.name || p.email]) || []
+                );
+                
+                for (const s of settlements) {
+                  await addSettlement({
+                    ...s,
+                    groupId: group.id,
+                    payMode,
+                    fromName: emailToName.get(s.from) ?? s.from,
+                    toName: emailToName.get(s.to) ?? s.to,
+                  });
+                }
+                // Auto update group status to settled
+                await updateGroupStatus(group.id, "settled");
+                onClose();
+              }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "600" }}>Settle</Text>
+            </TouchableOpacity>
+          ) : (
+            <View
+              style={{
+                backgroundColor: isDark ? "#333" : "#f0f0f0",
+                padding: 14,
+                borderRadius: 12,
+                alignItems: "center",
+                marginTop: 10,
+              }}
+            >
+              <Text
+                style={{
+                  color: colors.subtext,
+                  fontWeight: "600",
+                  textAlign: "center",
+                }}
+              >
+                Trip must be completed before settlement
+              </Text>
+            </View>
+          )}
 
           <TouchableOpacity
             onPress={onClose}
