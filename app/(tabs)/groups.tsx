@@ -6,9 +6,9 @@ import GroupHeader from "@/src/components/groups/GroupHeader";
 import GroupList from "@/src/components/groups/GroupList";
 import GroupQuickActions from "@/src/components/groups/GroupQuickActions";
 import GroupStats from "@/src/components/groups/GroupStats";
-import { addGroupExpense } from "@/src/services/addGroupExpense";
-import { useGroups } from "@/src/hooks/useGroups";
 import SplitPreviewModal from "@/src/components/groups/SplitPreviewModal";
+import { useGroups } from "@/src/hooks/useGroups";
+import { addGroupExpense } from "@/src/services/addGroupExpense";
 import { calculateSettlements } from "@/src/utils/settlement";
 
 import { authContext } from "@/src/context/authContext";
@@ -22,13 +22,13 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Animated,
-  Dimensions,
-  ScrollView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
+    Animated,
+    Dimensions,
+    ScrollView,
+    StatusBar,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { styles } from "@/src/css/group.styles";
@@ -195,6 +195,7 @@ export default function GroupsScreen() {
         onCreate={(name, members) => {
           if (!user) return;
           createGroup(user, name, members);
+          setShowCreateModal(false);
         }}
       />
 
@@ -236,6 +237,12 @@ export default function GroupsScreen() {
 
           if (!realGroup) {
             console.error("Group not found for expense:", expenseGroup.id);
+            return;
+          }
+
+          // Prevent adding expense if group is not active
+          if ((realGroup.status || "active") !== "active") {
+            console.error("Cannot add expense: Group is not active");
             return;
           }
 
