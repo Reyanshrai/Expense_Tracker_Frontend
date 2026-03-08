@@ -18,7 +18,10 @@ export function useGroupsUI() {
     icon: ICONS[index % ICONS.length],
     avatars: AVATARS.slice(0, Math.min(group.participants.length, 5)),
     isActive: Number(group.totalSpent ?? 0) > 0,
-    participants: group.participants, // 🔥 pass full data
+    participants: group.participants,
+    status: group.status,
+    createdBy: group.createdBy,
+    budget: group.budget,
   }));
 
   return { groups: uiGroups, loading };
