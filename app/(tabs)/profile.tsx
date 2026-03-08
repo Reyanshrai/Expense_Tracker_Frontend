@@ -1,36 +1,31 @@
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Image, 
-  Switch, 
-  TouchableOpacity, 
-  Alert,
-  Dimensions,
-  StatusBar,
-  Animated,
-  ScrollView,
-} from 'react-native';
-import { useState, useRef, useEffect } from 'react';
-import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
+import Skeleton from "@/src/components/ui/Skeleton";
 import { useTheme } from "@/src/context/themeContext";
-import { lightColors, darkColors } from "@/src/utils/themeColors";
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
-import { styles } from '../../src/css/profile.styles';
 import { useAuth } from "@/src/hooks/useAuth";
-import {logout} from '@/src/services/auth'
-import { auth } from "@/src/services/firebase";
+import { useNotifications } from "@/src/hooks/useNotifications";
+import { usePendingInvites } from "@/src/hooks/usePendingInvites";
+import { useProfileStats } from "@/src/hooks/useProfileStats";
+import { logout } from '@/src/services/auth';
+import { darkColors, lightColors } from "@/src/utils/themeColors";
+import { Feather, Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from "expo-router";
+import { useEffect, useRef } from 'react';
+import {
+  Alert,
+  Animated,
+  Dimensions,
+  Image,
+  ScrollView,
+  StatusBar,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import { styles } from '../../src/css/profile.styles';
 
 const { width } = Dimensions.get('window');
-
-const profileStats = [
-  { id: '1', label: 'Groups Joined', value: '8', icon: 'people', color: '#FF6B6B' },
-  { id: '2', label: 'Total Spent', value: '₹12.5k', icon: 'card', color: '#4ECDC4' },
-  { id: '3', label: 'Friends', value: '24', icon: 'heart', color: '#45B7D1' },
-  { id: '4', label: 'Saved', value: '₹2.8k', icon: 'trending-up', color: '#A55EEA' },
-];
 
 const menuItems = [
   { 
@@ -87,7 +82,18 @@ export default function ProfileScreen() {
   const { isDark, toggleTheme } = useTheme();
   const colors = isDark ? darkColors : lightColors;
   const { user } = useAuth();
+  const { formattedStats, loading: statsLoading } = useProfileStats();
+  const { pendingInvites, loading: invitesLoading, acceptInvite, accepting, hasPendingInvites } = usePendingInvites();
+  const { unreadCount, hasUnread } = useNotifications();
   const router = useRouter()
+
+  // Dynamic stats from Firestore
+  const profileStats = [
+    { id: '1', label: 'Groups Joined', value: formattedStats.groupsJoined, icon: 'people', color: '#FF6B6B' },
+    { id: '2', label: 'Total Spent', value: formattedStats.totalSpent, icon: 'card', color: '#4ECDC4' },
+    { id: '3', label: 'Friends', value: formattedStats.friendsCount, icon: 'heart', color: '#45B7D1' },
+    { id: '4', label: formattedStats.balanceLabel, value: formattedStats.balance, icon: 'trending-up', color: formattedStats.balanceColor },
+  ];
 
   
   // Animation refs
@@ -145,7 +151,11 @@ export default function ProfileScreen() {
       <View style={[styles.statIcon, { backgroundColor: `${item.color}20` }]}>
         <Ionicons name={item.icon} size={20} color={item.color} />
       </View>
-      <Text style={[styles.statValue, { color: colors.text }]}>{item.value}</Text>
+      {statsLoading ? (
+        <Skeleton width={50} height={20} style={{ marginVertical: 4 }} />
+      ) : (
+        <Text style={[styles.statValue, { color: colors.text }]}>{item.value}</Text>
+      )}
       <Text style={[styles.statLabel, { color: colors.subtext }]}>{item.label}</Text>
     </BlurView>
   );
@@ -240,6 +250,19 @@ export default function ProfileScreen() {
                     <Text style={styles.memberText}>{user?.metadata.creationTime? new Date(user.metadata.creationTime).toLocaleDateString('en-IN'):""}</Text>
                   </View>
                 </View>
+                <TouchableOpacity 
+                  style={styles.notificationBtn}
+                  onPress={() => router.push('/notifications')}
+                >
+                  <Ionicons name="notifications" size={20} color="rgba(255,255,255,0.8)" />
+                  {hasUnread && (
+                    <View style={styles.notificationBadge}>
+                      <Text style={styles.notificationBadgeText}>
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.settingsBtn}>
                   <Ionicons name="settings" size={20} color="rgba(255,255,255,0.8)" />
                 </TouchableOpacity>
@@ -265,6 +288,50 @@ export default function ProfileScreen() {
             ))}
           </View>
         </Animated.View>
+
+        {/* Invitations Section */}
+        {hasPendingInvites && (
+          <Animated.View style={[
+            styles.invitationsContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }]
+            }
+          ]}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Invitations 📩</Text>
+            <View style={styles.invitationsList}>
+              {pendingInvites.map((invite) => (
+                <BlurView 
+                  key={invite.groupId} 
+                  intensity={20} 
+                  tint={isDark ? "dark" : "light"} 
+                  style={styles.invitationCard}
+                >
+                  <View style={styles.invitationInfo}>
+                    <Text style={[styles.invitationGroupName, { color: colors.text }]}>
+                      {invite.groupName}
+                    </Text>
+                    <Text style={[styles.invitationText, { color: colors.subtext }]}>
+                      Invited by {invite.invitedBy}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => acceptInvite(invite.groupId)}
+                    disabled={accepting === invite.groupId}
+                    style={[
+                      styles.acceptButton,
+                      accepting === invite.groupId && styles.acceptButtonDisabled
+                    ]}
+                  >
+                    <Text style={styles.acceptButtonText}>
+                      {accepting === invite.groupId ? 'Accepting...' : 'Accept'}
+                    </Text>
+                  </TouchableOpacity>
+                </BlurView>
+              ))}
+            </View>
+          </Animated.View>
+        )}
 
         {/* Theme Toggle */}
         <Animated.View style={[
