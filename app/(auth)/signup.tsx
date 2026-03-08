@@ -6,18 +6,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-    Alert,
-    Animated,
-    Dimensions,
-    Keyboard,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StatusBar,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  Alert,
+  Animated,
+  Dimensions,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StatusBar,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
 } from "react-native";
 import { styles } from '../../src/css/login.styles';
 import { loginWithGoogleWeb, registerWithEmail } from "../../src/services/auth";
@@ -30,10 +31,6 @@ export default function SignScreen() {
   const [password, setPassword] = useState("");
   const [confrimPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isEmailFocused, setIsEmailFocused] = useState(false);
-  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  const [isConfirmFocused, setIsConfirmFocused] = useState(false);
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
   
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -43,14 +40,6 @@ export default function SignScreen() {
   // Skip setting up Google Auth if no client ID
 
   useEffect(() => {
-    // Keyboard listeners
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      setKeyboardVisible(true);
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardVisible(false);
-    });
-
     // Entrance animation 
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -80,11 +69,6 @@ export default function SignScreen() {
         }),
       ])
     ).start();
-
-    return () => {
-      keyboardDidShowListener?.remove();
-      keyboardDidHideListener?.remove();
-    };
   }, []);
   
 
@@ -123,154 +107,134 @@ export default function SignScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      
-      {/* Background Gradient */}
-      <LinearGradient
-        colors={['#667eea', '#764ba2', '#f093fb']}
-        style={styles.backgroundGradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      />
-      
-      {/* Animated Floating Elements - Hide when keyboard is visible */}
-      {!keyboardVisible && (
-        <>
-          <Animated.View style={[styles.floatingCircle, styles.circle1, {
-            transform: [{ scale: pulseAnim }]
-          }]} />
-          <Animated.View style={[styles.floatingCircle, styles.circle2, {
-            transform: [{ scale: pulseAnim }]
-          }]} />
-          <Animated.View style={[styles.floatingCircle, styles.circle3]} />
-        </>
-      )}
-      
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
-        style={styles.keyboardContainer}
-        keyboardVerticalOffset={80}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          keyboardDismissMode="none"
-          bounces={false}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <StatusBar barStyle="light-content" />
+        
+        {/* Background Gradient */}
+        <LinearGradient
+          colors={['#667eea', '#764ba2', '#f093fb']}
+          style={styles.backgroundGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        />
+        
+        {/* Animated Floating Elements */}
+        <Animated.View style={[styles.floatingCircle, styles.circle1, {
+          transform: [{ scale: pulseAnim }]
+        }]} />
+        <Animated.View style={[styles.floatingCircle, styles.circle2, {
+          transform: [{ scale: pulseAnim }]
+        }]} />
+        <Animated.View style={[styles.floatingCircle, styles.circle3]} />
+        
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+          style={styles.keyboardContainer}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         >
-          <Animated.View style={[
-            styles.contentContainer,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }]
-            }
-          ]}>
-            {/* Header Section */}
-            <View style={styles.headerContainer}>
-              <View style={styles.welcomeSection}>
-                <Text style={styles.welcomeText}>Welcome Back! 👋</Text>
-                <Text style={styles.title}>Sign Up to continue</Text>
-                <Text style={styles.subtitle}>Your financial journey awaits</Text>
-              </View>
-            </View>
-
-            {/* Form Section */}
-            <View style={[styles.formContainer, {flex:1}]}>
-              {/* Email Input */}
-              <View style={styles.inputWrapper}>
-                <View style={[
-                  styles.inputContainer, 
-                  isEmailFocused && styles.inputFocused
-                ]}>
-                  <Feather 
-                    name="mail" 
-                    size={20} 
-                    color={isEmailFocused ? '#667eea' : 'rgba(255,255,255,0.7)'} 
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    placeholder="Enter your email"
-                    placeholderTextColor="rgba(255,255,255,0.6)"
-                    value={email}
-                    onChangeText={setEmail}
-                    style={styles.input}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    textContentType="emailAddress"
-                    onFocus={() => setIsEmailFocused(true)}
-                    onBlur={() => setIsEmailFocused(false)}
-                  />
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            <Animated.View style={[
+              styles.contentContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }]
+              }
+            ]}>
+              {/* Header Section */}
+              <View style={styles.headerContainer}>
+                <View style={styles.welcomeSection}>
+                  <Text style={styles.welcomeText}>Create Account! 👋</Text>
+                  <Text style={styles.title}>Sign Up to continue</Text>
+                  <Text style={styles.subtitle}>Your financial journey awaits</Text>
                 </View>
               </View>
 
-              {/* Password Input */}
-              <View style={styles.inputWrapper}>
-                <View style={[
-                  styles.inputContainer, 
-                  isPasswordFocused && styles.inputFocused
-                ]}>
-                  <Feather 
-                    name="lock" 
-                    size={20} 
-                    color={isPasswordFocused ? '#667eea' : 'rgba(255,255,255,0.7)'} 
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    placeholder="Enter your password"
-                    placeholderTextColor="rgba(255,255,255,0.6)"
-                    value={password}
-                    onChangeText={setPassword}
-                    style={[styles.input, styles.passwordInput]}
-                    secureTextEntry={!showPassword}
-                    autoComplete="password"
-                    textContentType="password"
-                    onFocus={() => setIsPasswordFocused(true)}
-                    onBlur={() => setIsPasswordFocused(false)}
-                  />
-                </View>
-              </View>
-
-            {/* confirm password */}
-
-              <View style={styles.inputWrapper}>
-                <View style={[
-                  styles.inputContainer, 
-                  isPasswordFocused && styles.inputFocused
-                ]}>
-                  <Feather 
-                    name="lock" 
-                    size={20} 
-                    color={isPasswordFocused ? '#667eea' : 'rgba(255,255,255,0.7)'} 
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    placeholder="Confirm password"
-                    placeholderTextColor="rgba(255,255,255,0.6)"
-                    value={confrimPassword}
-                    onChangeText={setConfirmPassword}
-                    style={[styles.input, styles.passwordInput]}
-                    secureTextEntry={!showPassword}
-                    autoComplete="password"
-                    textContentType="password"
-                    onFocus={() => setIsConfirmFocused(true)}
-                    onBlur={() => setIsConfirmFocused(false)}
-                  />
-                  <TouchableOpacity 
-                    onPress={() => setShowPassword(!showPassword)}
-                    style={styles.eyeIcon}
-                    activeOpacity={0.7}
-                  >
+              {/* Form Section */}
+              <View style={styles.formContainer}>
+                {/* Email Input */}
+                <View style={styles.inputWrapper}>
+                  <View style={styles.inputContainer}>
                     <Feather 
-                      name={showPassword ? "eye" : "eye-off"} 
+                      name="mail" 
                       size={20} 
-                      color="rgba(255,255,255,0.7)" 
+                      color='rgba(255,255,255,0.7)'
+                      style={styles.inputIcon}
                     />
-                  </TouchableOpacity>
+                    <TextInput
+                      placeholder="Enter your email"
+                      placeholderTextColor="rgba(255,255,255,0.6)"
+                      value={email}
+                      onChangeText={setEmail}
+                      style={styles.input}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoComplete="email"
+                      textContentType="emailAddress"
+                    />
+                  </View>
+                </View>
+
+                {/* Password Input */}
+                <View style={styles.inputWrapper}>
+                  <View style={styles.inputContainer}>
+                    <Feather 
+                      name="lock" 
+                      size={20} 
+                      color='rgba(255,255,255,0.7)'
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      placeholder="Enter your password"
+                      placeholderTextColor="rgba(255,255,255,0.6)"
+                      value={password}
+                      onChangeText={setPassword}
+                      style={[styles.input, styles.passwordInput]}
+                      secureTextEntry={!showPassword}
+                      autoComplete="password"
+                      textContentType="password"
+                    />
+                  </View>
+                </View>
+
+                {/* Confirm Password */}
+                <View style={styles.inputWrapper}>
+                  <View style={styles.inputContainer}>
+                    <Feather 
+                      name="lock" 
+                      size={20} 
+                      color='rgba(255,255,255,0.7)'
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      placeholder="Confirm password"
+                      placeholderTextColor="rgba(255,255,255,0.6)"
+                      value={confrimPassword}
+                      onChangeText={setConfirmPassword}
+                      style={[styles.input, styles.passwordInput]}
+                      secureTextEntry={!showPassword}
+                      autoComplete="password"
+                      textContentType="password"
+                    />
+                    <TouchableOpacity 
+                      onPress={() => setShowPassword(!showPassword)}
+                      style={styles.eyeIcon}
+                      activeOpacity={0.7}
+                    >
+                      <Feather 
+                        name={showPassword ? "eye" : "eye-off"} 
+                        size={20} 
+                        color="rgba(255,255,255,0.7)" 
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-            </View>
 
             {/* Button Section */}
             <View style={styles.buttonSection}>
@@ -326,5 +290,6 @@ export default function SignScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
+    </TouchableWithoutFeedback>
   );
 }
