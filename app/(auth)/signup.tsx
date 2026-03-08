@@ -1,25 +1,26 @@
+import { auth } from "@/src/services/firebase";
+import { autoAcceptPendingInvites } from '@/src/services/group';
+import { createUserProfileIfNotExists } from '@/src/services/user';
 import { AntDesign, Feather, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  Alert,
-  Animated,
-  Dimensions,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StatusBar,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    Alert,
+    Animated,
+    Dimensions,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StatusBar,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from "react-native";
 import { styles } from '../../src/css/login.styles';
 import { loginWithGoogleWeb, registerWithEmail } from "../../src/services/auth";
-import {createUserProfileIfNotExists} from '@/src/services/user'
-import {auth} from "@/src/services/firebase"
 
 const { width, height } = Dimensions.get('window');
 
@@ -96,6 +97,8 @@ export default function SignScreen() {
     try{
       const userCredentail = await registerWithEmail(email,password,confrimPassword)
       await createUserProfileIfNotExists(userCredentail.user);
+      // Auto-accept any pending group invitations
+      await autoAcceptPendingInvites(userCredentail.user.uid, userCredentail.user.email!);
       router.replace("/(auth)/login")
     }catch(error:any){
       console.error("SIGNUP ERROR:", error);
@@ -109,6 +112,10 @@ export default function SignScreen() {
     try{
       await loginWithGoogleWeb()
       await createUserProfileIfNotExists(auth.currentUser!);
+      // Auto-accept any pending group invitations
+      if (auth.currentUser) {
+        await autoAcceptPendingInvites(auth.currentUser.uid, auth.currentUser.email!);
+      }
       router.replace("/(tabs)")
     }catch(error:any){
         Alert.alert("Google Login Failed", error.message)
