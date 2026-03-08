@@ -1,11 +1,7 @@
 import AddExpenseModal from "@/src/components/groups/AddExpenseModal";
 import CreateGroupModal from "@/src/components/groups/CreateGroupModal";
 import GroupDetailScreen from "@/src/components/groups/GroupDetailScreen";
-import GroupFilters from "@/src/components/groups/GroupFilters";
 import GroupList from "@/src/components/groups/GroupList";
-import GroupQuickActions from "@/src/components/groups/GroupQuickActions";
-import GroupsListHeader from "@/src/components/groups/GroupsListHeader";
-import GroupStats from "@/src/components/groups/GroupStats";
 import SplitPreviewModal from "@/src/components/groups/SplitPreviewModal";
 import { SkeletonList } from "@/src/components/ui/Skeleton";
 import { useGroups } from "@/src/hooks/useGroups";
@@ -27,7 +23,6 @@ import {
   Alert,
   Animated,
   Dimensions,
-  ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
@@ -210,45 +205,21 @@ export default function GroupsScreen() {
         end={{ x: 1, y: 1 }}
       />
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* 🧠 HEADER */}
-        <GroupsListHeader fadeAnim={fadeAnim} slideAnim={slideAnim} />
-
-        {/* 📈 STATS */}
-        <GroupStats
-          groups={uiGroups.map((g) => ({ ...g, members: g.members }))}
-          activeGroupCount={uiGroups.filter((g) => (g.status || "active") === "active").length}
-          fadeAnim={fadeAnim}
-          scaleAnim={scaleAnim}
-        />
-
-        {/* ⚡ QUICK ACTIONS */}
-        <GroupQuickActions fadeAnim={fadeAnim} slideAnim={slideAnim} />
-
-        {/* 🧩 FILTERS */}
-        <GroupFilters
-          selectedFilter={selectedFilter}
-          setSelectedFilter={setSelectedFilter}
-          groups={uiGroups}
-          fadeAnim={fadeAnim}
-          slideAnim={slideAnim}
-          colors={colors}
-        />
-
-        {/* 👥 GROUP LIST */}
-        <GroupList
-          groups={filteredGroups}
-          fadeAnim={fadeAnim}
-          slideAnim={slideAnim}
-          onSelectGroup={(group: any) => setSelectedGroup(group)}
-          onAddExpense={(group: any) => setExpenseGroup(group)}
-          onCreateGroup={() => setShowCreateModal(true)}
-          onSplit={(group: any) => setSplitGroup(group)}
-        />
-      </ScrollView>
+      {/* 👥 GROUP LIST with Header as ListHeaderComponent */}
+      <GroupList
+        groups={filteredGroups}
+        fadeAnim={fadeAnim}
+        slideAnim={slideAnim}
+        scaleAnim={scaleAnim}
+        activeGroupCount={uiGroups.filter((g) => (g.status || "active") === "active").length}
+        allGroups={uiGroups}
+        selectedFilter={selectedFilter}
+        setSelectedFilter={setSelectedFilter}
+        onSelectGroup={(group: any) => setSelectedGroup(group)}
+        onAddExpense={(group: any) => setExpenseGroup(group)}
+        onCreateGroup={() => setShowCreateModal(true)}
+        onSplit={(group: any) => setSplitGroup(group)}
+      />
 
       {/* ➕ CREATE GROUP MODAL */}
       <CreateGroupModal
