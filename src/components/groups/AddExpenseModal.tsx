@@ -1,7 +1,8 @@
-import { View, Text, Modal, TextInput, TouchableOpacity } from "react-native";
-import { useState } from "react";
 import { useTheme } from "@/src/context/themeContext";
+import { showError, showSuccess, validateAmount } from "@/src/utils/errorHandler";
 import { darkColors, lightColors } from "@/src/utils/themeColors";
+import { useState } from "react";
+import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 type addExpenseModalProps = {
   visible: boolean;
@@ -81,10 +82,19 @@ export default function addExpenseModal({
 
           <TouchableOpacity
             onPress={() => {
-              if (!title || !amount) return;
-              onSave(title, Number(amount));
+              if (!title.trim()) {
+                showError("unknown", "Please enter an expense title");
+                return;
+              }
+              const numAmount = Number(amount);
+              if (!validateAmount(numAmount)) {
+                showError("invalid_amount");
+                return;
+              }
+              onSave(title.trim(), numAmount);
               setTitle("");
               setAmount("");
+              showSuccess("Expense Added", "Your expense has been added successfully!");
             }}
             style={{
               backgroundColor: "#4ECDC4",
