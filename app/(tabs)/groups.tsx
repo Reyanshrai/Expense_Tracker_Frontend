@@ -2,11 +2,12 @@ import AddExpenseModal from "@/src/components/groups/AddExpenseModal";
 import CreateGroupModal from "@/src/components/groups/CreateGroupModal";
 import GroupDetailScreen from "@/src/components/groups/GroupDetailScreen";
 import GroupFilters from "@/src/components/groups/GroupFilters";
-import GroupHeader from "@/src/components/groups/GroupHeader";
 import GroupList from "@/src/components/groups/GroupList";
 import GroupQuickActions from "@/src/components/groups/GroupQuickActions";
+import GroupsListHeader from "@/src/components/groups/GroupsListHeader";
 import GroupStats from "@/src/components/groups/GroupStats";
 import SplitPreviewModal from "@/src/components/groups/SplitPreviewModal";
+import { SkeletonList } from "@/src/components/ui/Skeleton";
 import { useGroups } from "@/src/hooks/useGroups";
 import { addGroupExpense } from "@/src/services/addGroupExpense";
 import { calculateSettlements } from "@/src/utils/settlement";
@@ -14,21 +15,23 @@ import { calculateSettlements } from "@/src/utils/settlement";
 import { authContext } from "@/src/context/authContext";
 import { useTheme } from "@/src/context/themeContext";
 import { useGroupsUI } from "@/src/hooks/useGroupsUI";
-import { createGroup } from "@/src/services/group";
+import { createGroup, joinGroupViaInvite } from "@/src/services/group";
 import { darkColors, lightColors } from "@/src/utils/themeColors";
+import * as Linking from "expo-linking";
 
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
-    Animated,
-    Dimensions,
-    ScrollView,
-    StatusBar,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Animated,
+  Dimensions,
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { styles } from "@/src/css/group.styles";
@@ -54,6 +57,7 @@ export default function GroupsScreen() {
   const [expenseGroup, setExpenseGroup] = useState<any | null>(null);
   const [splitGroup, setSplitGroup] = useState<any | null>(null);
   const [settlements, setSettlements] = useState<any[]>([]);
+  const [joiningGroup, setJoiningGroup] = useState(false);
 
   // 🎨 Theme
   const { isDark } = useTheme();
@@ -86,20 +90,76 @@ export default function GroupsScreen() {
     ]).start();
   }, []);
 
-  // 🔍 Filtering logic
+  // 🔗 Deep Link Handling for Group Join
+  useEffect(() => {
+    if (!user) return;
+
+    const handleDeepLink = async (url: string) => {
+      const { path, queryParams } = Linking.parse(url);
+      
+      if (path === "join" && queryParams?.groupId) {
+        const groupId = queryParams.groupId as string;
+        
+        // Check if user is already a member
+        const isMember = uiGroups.some((g) => g.id === groupId);
+        if (isMember) {
+          Alert.alert("Already Member", "You are already a member of this group.");
+          return;
+        }
+
+        setJoiningGroup(true);
+        try {
+          const result = await joinGroupViaInvite(
+            groupId,
+            user.uid,
+            user.email!,
+            user.displayName || "User"
+          );
+          Alert.alert(
+            "Success!",
+            `You have joined "${result.groupName}" successfully!`,
+            [{ text: "OK" }]
+          );
+        } catch (error: any) {
+          Alert.alert("Error", error.message || "Failed to join group");
+        } finally {
+          setJoiningGroup(false);
+        }
+      }
+    };
+
+    // Handle initial URL
+    Linking.getInitialURL().then((url) => {
+      if (url) handleDeepLink(url);
+    });
+
+    // Listen for URL changes
+    const subscription = Linking.addEventListener("url", (event) => {
+      if (event.url) handleDeepLink(event.url);
+    });
+
+    return () => subscription.remove();
+  }, [user, uiGroups]);
+
+  // 🔍 Filtering logic based on group status
   const filteredGroups = useMemo(() => {
     if (selectedFilter === "all") return uiGroups;
     if (selectedFilter === "active") {
-      return uiGroups.filter((g) => g.totalSpent > 0);
+      // Show only groups with status "active"
+      return uiGroups.filter((g) => (g.status || "active") === "active");
     }
-    return uiGroups.filter((g) => g.totalSpent === 0);
+    // Inactive: show groups with status "completed" or "settled"
+    return uiGroups.filter((g) => {
+      const status = g.status || "active";
+      return status === "completed" || status === "settled";
+    });
   }, [uiGroups, selectedFilter]);
 
   // ⏳ Loading state
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{ color: colors.text }}>Loading groups...</Text>
+      <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: 60 }}>
+        <SkeletonList count={5} />
       </View>
     );
   }
@@ -155,11 +215,12 @@ export default function GroupsScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         {/* 🧠 HEADER */}
-        <GroupHeader fadeAnim={fadeAnim} slideAnim={slideAnim} />
+        <GroupsListHeader fadeAnim={fadeAnim} slideAnim={slideAnim} />
 
         {/* 📈 STATS */}
         <GroupStats
           groups={uiGroups.map((g) => ({ ...g, members: g.members }))}
+          activeGroupCount={uiGroups.filter((g) => (g.status || "active") === "active").length}
           fadeAnim={fadeAnim}
           scaleAnim={scaleAnim}
         />
@@ -184,6 +245,7 @@ export default function GroupsScreen() {
           slideAnim={slideAnim}
           onSelectGroup={(group: any) => setSelectedGroup(group)}
           onAddExpense={(group: any) => setExpenseGroup(group)}
+          onCreateGroup={() => setShowCreateModal(true)}
           onSplit={(group: any) => setSplitGroup(group)}
         />
       </ScrollView>
