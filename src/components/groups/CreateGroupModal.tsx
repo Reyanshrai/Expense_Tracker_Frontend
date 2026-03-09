@@ -1,16 +1,17 @@
 import { useTheme } from "@/src/context/themeContext";
+import { showError, validateEmail, validateGroupName } from "@/src/utils/errorHandler";
 import { darkColors, lightColors } from "@/src/utils/themeColors";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from "react-native";
 
 export type Member = {
@@ -42,10 +43,25 @@ export default function CreateGroupModal({
   const [members, setMembers] = useState<Member[]>([]);
 
   const addMember = () => {
-    if (!name.trim() || !email.trim()) return;
-    if (members.some((m) => m.email === email.trim())) return;
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
     
-    setMembers([...members, { name: name.trim(), email: email.trim() }]);
+    if (!trimmedName || !trimmedEmail) {
+      showError("unknown", "Please enter both name and email");
+      return;
+    }
+    
+    if (!validateEmail(trimmedEmail)) {
+      showError("invalid_email");
+      return;
+    }
+    
+    if (members.some((m) => m.email === trimmedEmail)) {
+      showError("duplicate_email");
+      return;
+    }
+    
+    setMembers([...members, { name: trimmedName, email: trimmedEmail }]);
     setName("");
     setEmail("");
   };
@@ -55,7 +71,10 @@ export default function CreateGroupModal({
   };
 
   const handleCreate = () => {
-    if (mode === "create" && !groupName.trim()) return;
+    if (mode === "create" && !validateGroupName(groupName)) {
+      showError("empty_group_name");
+      return;
+    }
     onCreate(mode === "create" ? groupName.trim() : existingGroupName || "", members);
     setGroupName("");
     setName("");
