@@ -1,26 +1,23 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  Animated,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { useTheme } from "@/src/context/themeContext";
-import { lightColors, darkColors } from "@/src/utils/themeColors";
-import { styles } from "../../src/css/expense.styles";
 import { addExpense } from "@/src/services/expense";
 import { auth } from "@/src/services/firebase";
 import { categoryMeta } from "@/src/utils/categoryMeta";
+import { darkColors, lightColors } from "@/src/utils/themeColors";
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from "react-native";
+import { styles } from "../../src/css/expense.styles";
 
 export default function AddExpenseScreen() {
   const [title, setTitle] = useState("");
@@ -96,6 +93,7 @@ export default function AddExpenseScreen() {
         style={[styles.container, { backgroundColor: colors.background }]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 120, flexGrow: 1 }}
       >
         {/* Header Section */}
         <View style={styles.headerContainer}>
