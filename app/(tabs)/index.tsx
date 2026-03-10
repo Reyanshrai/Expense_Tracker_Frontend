@@ -1,28 +1,26 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  Dimensions,
-  StatusBar,
-  Animated,
-  ScrollView,
-} from "react-native";
-import { useState, useRef, useEffect } from "react";
-import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
 import { useTheme } from "@/src/context/themeContext";
-import { lightColors, darkColors } from "@/src/utils/themeColors";
-import { LinearGradient } from "expo-linear-gradient";
-import { BlurView } from "expo-blur";
-import { styles } from "../../src/css/index.styles";
-import { listenUserExpenses } from "@/src/services/expense";
 import { useAuth } from "@/src/hooks/useAuth";
-import { onAuthStateChanged } from "firebase/auth";
-import { categoryMeta } from "@/src/utils/categoryMeta";
+import { listenUserExpenses } from "@/src/services/expense";
 import { calcCategoryStats } from "@/src/utils/calcCategoryStats";
+import { categoryMeta } from "@/src/utils/categoryMeta";
+import { darkColors, lightColors } from "@/src/utils/themeColors";
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { useEffect, useRef, useState } from "react";
+import {
+    Animated,
+    Dimensions,
+    FlatList,
+    Image,
+    ScrollView,
+    StatusBar,
+    Text,
+    TouchableOpacity,
+    View
+} from "react-native";
+import { styles } from "../../src/css/index.styles";
 
 const { width } = Dimensions.get("window");
 
@@ -210,6 +208,7 @@ export default function HomeScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
       >
         {/* Header */}
         <Animated.View
