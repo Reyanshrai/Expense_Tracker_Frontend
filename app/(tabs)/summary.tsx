@@ -1,18 +1,16 @@
+import { useTheme } from "@/src/context/themeContext";
+import { useSummary } from "@/src/hooks/useSummary";
+import { darkColors, lightColors } from "@/src/utils/themeColors";
 import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  TouchableOpacity,
+    Dimensions,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 import { PieChart } from "react-native-chart-kit";
-import { LinearGradient } from "expo-linear-gradient"; // You'll need to install this
-import { useTheme } from "@/src/context/themeContext";
-import { lightColors, darkColors } from "@/src/utils/themeColors";
 import { styles } from "../../src/css/summary.styles";
-import { useSummary } from "@/src/hooks/useSummary";
 
 export default function SummaryScreen() {
 
@@ -50,6 +48,8 @@ export default function SummaryScreen() {
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 120 }}
+      keyboardShouldPersistTaps="handled"
     >
       {/* Header Section */}
       <View style={styles.headerContainer}>
