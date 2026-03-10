@@ -1,4 +1,3 @@
-import Skeleton, { SkeletonList } from "@/src/components/ui/Skeleton";
 import { authContext } from "@/src/context/authContext";
 import { useTheme } from "@/src/context/themeContext";
 import { useGroupAnalytics } from "@/src/hooks/useGroupAnalytics";
@@ -6,18 +5,17 @@ import { useGroupExpenses } from "@/src/hooks/useGroupExpenses";
 import { useGroupSettlements } from "@/src/hooks/useGroupSettlements";
 import { isGroupAdmin } from "@/src/services/group";
 import { calculateBalances } from "@/src/utils/calculateBalances";
-import { calculateSettlements } from "@/src/utils/settlement";
 import { darkColors, lightColors } from "@/src/utils/themeColors";
-import { useContext, useMemo, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { useContext, useState } from "react";
+import { Text, useWindowDimensions, View } from "react-native";
+import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 
-import AnalyticsSection from "./AnalyticsSection";
-import BalanceSummaryCard from "./BalanceSummaryCard";
-import BudgetSection from "./BudgetSection";
 import EditExpenseModal from "./EditExpenseModal";
-import ExpenseList from "./ExpenseList";
 import GroupHeader from "./GroupHeader";
-import SettlementHistory from "./SettlementHistory";
+import AnalyticsTab from "./tabs/AnalyticsTab";
+import BalancesTab from "./tabs/BalancesTab";
+import ExpensesTab from "./tabs/ExpensesTab";
+import SettlementsTab from "./tabs/SettlementsTab";
 
 interface Props {
   group: {
@@ -29,12 +27,23 @@ interface Props {
     createdBy: string;
   };
   onBack: () => void;
+  onAddExpense?: () => void;
 }
 
-export default function GroupDetailScreen({ group, onBack }: Props) {
+export default function GroupDetailScreen({ group, onBack, onAddExpense }: Props) {
   const { isDark } = useTheme();
   const colors = isDark ? darkColors : lightColors;
   const { user } = useContext(authContext);
+  const layout = useWindowDimensions();
+
+  // Tab state
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    { key: "expenses", title: "Expenses" },
+    { key: "balances", title: "Balances" },
+    { key: "analytics", title: "Analytics" },
+    { key: "settlements", title: "Settlements" },
+  ]);
 
   // Safety check for group
   if (!group || !group.id) {
@@ -49,22 +58,10 @@ export default function GroupDetailScreen({ group, onBack }: Props) {
   const { settlements: recordedSettlements, loading: settlementsLoading } =
     useGroupSettlements(group.id);
   const balances = calculateBalances(expenses);
-  const calculatedSettlements = calculateSettlements(balances);
   const analytics = useGroupAnalytics(expenses);
-
-  // Calculate user's balance in this group
-  const { youOwe, youAreOwed } = useMemo(() => {
-    if (!user || !balances) return { youOwe: 0, youAreOwed: 0 };
-    
-    // Try to find user's balance by uid or email
-    const userEmail = user.email;
-    const balance = balances[user.uid] ?? balances[userEmail ?? ""] ?? 0;
-    
-    return {
-      youOwe: balance < 0 ? Math.abs(balance) : 0,
-      youAreOwed: balance > 0 ? balance : 0,
-    };
-  }, [balances, user]);
+  
+  // Calculate total amount from expenses
+  const totalAmount = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
 
   const userIsAdmin = user ? isGroupAdmin(group, user.uid) : false;
   const groupStatus = group.status || "active";
@@ -79,57 +76,105 @@ export default function GroupDetailScreen({ group, onBack }: Props) {
     setShowEditModal(true);
   };
 
+  // Tab renderers
+  const renderExpensesTab = () => (
+    <ExpensesTab
+      expenses={expenses}
+      loading={loading}
+      user={user}
+      userIsAdmin={userIsAdmin}
+      onEdit={handleEditExpense}
+      onAddExpense={onAddExpense}
+    />
+  );
+
+  const renderBalancesTab = () => (
+    <BalancesTab
+      balances={balances}
+      currentUserEmail={user?.email || undefined}
+    />
+  );
+
+  const renderAnalyticsTab = () => (
+    <AnalyticsTab 
+      analytics={analytics} 
+      budget={budget}
+      totalSpent={totalSpent}
+      userIsAdmin={userIsAdmin}
+      groupStatus={groupStatus}
+      groupId={group.id}
+    />
+  );
+
+  const renderSettlementsTab = () => (
+    <SettlementsTab
+      settlements={recordedSettlements}
+      loading={settlementsLoading}
+    />
+  );
+
+  const renderScene = SceneMap({
+    expenses: renderExpensesTab,
+    balances: renderBalancesTab,
+    analytics: renderAnalyticsTab,
+    settlements: renderSettlementsTab,
+  });
+
+  const renderTabBar = (props: any) => (
+    <TabBar
+      {...props}
+      indicatorStyle={{ backgroundColor: "#667eea", height: 3 }}
+      style={{
+        backgroundColor: colors.background,
+        elevation: 0,
+        shadowOpacity: 0,
+        borderBottomWidth: 1,
+        borderBottomColor: isDark ? "#333" : "#e0e0e0",
+      }}
+      labelStyle={{
+        color: colors.text,
+        fontWeight: "600",
+        fontSize: 13,
+        textTransform: "none",
+      }}
+      activeColor="#667eea"
+      inactiveColor={colors.subtext}
+      pressColor="transparent"
+      renderLabel={({ route, focused }: { route: any; focused: boolean }) => (
+        <Text
+          style={{
+            color: focused ? "#667eea" : colors.subtext,
+            fontWeight: focused ? "700" : "500",
+            fontSize: 13,
+          }}
+        >
+          {route.title}
+        </Text>
+      )}
+    />
+  );
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <GroupHeader
-          group={group}
-          totalSpent={totalSpent}
-          userIsAdmin={userIsAdmin}
-          onBack={onBack}
-        />
+      {/* Compact Header */}
+      <GroupHeader
+        group={group}
+        totalSpent={totalSpent}
+        userIsAdmin={userIsAdmin}
+        onBack={onBack}
+      />
 
-        {/* Budget Section */}
-        <BudgetSection
-          groupId={group.id}
-          budget={budget}
-          totalSpent={totalSpent}
-          userIsAdmin={userIsAdmin}
-          groupStatus={groupStatus}
-        />
-
-        {/* Balance Summary Card */}
-        {!loading && expenses.length > 0 && (
-          <BalanceSummaryCard youOwe={youOwe} youAreOwed={youAreOwed} />
-        )}
-
-        {/* Analytics Section */}
-        {!loading && <AnalyticsSection analytics={analytics} />}
-
-        {/* Loading State */}
-        {loading && (
-          <View style={{ padding: 16 }}>
-            <Skeleton width="60%" height={20} style={{ marginBottom: 16 }} />
-            <SkeletonList count={3} />
-          </View>
-        )}
-
-        {/* Expense List */}
-        <ExpenseList
-          expenses={expenses}
-          user={user}
-          userIsAdmin={userIsAdmin}
-          onEdit={handleEditExpense}
-        />
-
-        {/* Settlement History */}
-        <SettlementHistory
-          settlements={recordedSettlements}
-          loading={settlementsLoading}
-          groupStatus={groupStatus}
-        />
-      </ScrollView>
+      {/* Tabs */}
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        initialLayout={{ width: layout.width }}
+        renderTabBar={renderTabBar}
+        swipeEnabled={true}
+        lazy={true}
+        lazyPreloadDistance={1}
+      />
 
       {/* Edit Expense Modal */}
       <EditExpenseModal
