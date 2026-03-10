@@ -1,3 +1,4 @@
+import EditProfileModal from "@/src/components/profile/EditProfileModal";
 import Skeleton from "@/src/components/ui/Skeleton";
 import { useTheme } from "@/src/context/themeContext";
 import { useAuth } from "@/src/hooks/useAuth";
@@ -10,12 +11,12 @@ import { Feather, Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from "expo-router";
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
-  Alert,
   Animated,
   Dimensions,
   Image,
+  Linking,
   ScrollView,
   StatusBar,
   Switch,
@@ -27,57 +28,6 @@ import { styles } from '../../src/css/profile.styles';
 
 const { width } = Dimensions.get('window');
 
-const menuItems = [
-  { 
-    id: '1', 
-    title: 'Edit Profile', 
-    subtitle: 'Update your personal information',
-    icon: 'person-circle', 
-    color: '#FF6B6B',
-    action: () => Alert.alert('Coming Soon', 'Profile editing feature is coming soon! 🚧')
-  },
-  { 
-    id: '2', 
-    title: 'Manage Groups', 
-    subtitle: 'View and manage your groups',
-    icon: 'people-circle', 
-    color: '#4ECDC4',
-    action: () => Alert.alert('Coming Soon', 'Group management is under development! 👥')
-  },
-  { 
-    id: '3', 
-    title: 'Payment Methods', 
-    subtitle: 'Add or update payment options',
-    icon: 'card', 
-    color: '#45B7D1',
-    action: () => Alert.alert('Coming Soon', 'Payment methods coming soon! 💳')
-  },
-  { 
-    id: '4', 
-    title: 'Notifications', 
-    subtitle: 'Manage notification preferences',
-    icon: 'notifications-circle', 
-    color: '#F7B731',
-    action: () => Alert.alert('Coming Soon', 'Notification settings coming soon! 🔔')
-  },
-  { 
-    id: '5', 
-    title: 'Security & Privacy', 
-    subtitle: 'Change password and privacy settings',
-    icon: 'shield-checkmark', 
-    color: '#A55EEA',
-    action: () => Alert.alert('Coming Soon', 'Security settings coming soon! 🛡️')
-  },
-  { 
-    id: '6', 
-    title: 'Help & Support', 
-    subtitle: 'Get help or contact support',
-    icon: 'help-circle', 
-    color: '#FF8E53',
-    action: () => Alert.alert('Help & Support', 'Need help? Contact us at help@expenseapp.com 📧')
-  },
-];
-
 export default function ProfileScreen() {
   const { isDark, toggleTheme } = useTheme();
   const colors = isDark ? darkColors : lightColors;
@@ -86,6 +36,41 @@ export default function ProfileScreen() {
   const { pendingInvites, loading: invitesLoading, acceptInvite, accepting, hasPendingInvites } = usePendingInvites();
   const { unreadCount, hasUnread } = useNotifications();
   const router = useRouter()
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  // Format member since date
+  const getMemberSince = () => {
+    if (!user?.metadata?.creationTime) return "";
+    const date = new Date(user.metadata.creationTime);
+    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  };
+
+  const menuItems = [
+    { 
+      id: '1', 
+      title: 'Edit Profile', 
+      subtitle: 'Update your personal information',
+      icon: 'person-circle', 
+      color: '#FF6B6B',
+      action: () => setShowEditModal(true)
+    },
+    { 
+      id: '2', 
+      title: 'Notifications', 
+      subtitle: 'View your notifications',
+      icon: 'notifications-circle', 
+      color: '#F7B731',
+      action: () => router.push('/notifications')
+    },
+    { 
+      id: '3', 
+      title: 'Help & Support', 
+      subtitle: 'Get help or contact support',
+      icon: 'help-circle', 
+      color: '#FF8E53',
+      action: () => Linking.openURL('mailto:reyanshrai05@gmail.com?subject=Support Request')
+    },
+  ];
 
   // Dynamic stats from Firestore
   const profileStats = [
@@ -211,7 +196,8 @@ export default function ProfileScreen() {
 
       <ScrollView 
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 140 }]}
+        keyboardShouldPersistTaps="handled"
       >
         {/* Header Profile Section */}
         <Animated.View style={[
@@ -238,16 +224,16 @@ export default function ProfileScreen() {
                     style={styles.avatar}
                   />
                   <View style={styles.onlineIndicator} />
-                  <TouchableOpacity style={styles.editAvatarBtn}>
+                  {/* <TouchableOpacity style={styles.editAvatarBtn}>
                     <Ionicons name="camera" size={16} color="#fff" />
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </Animated.View>
                 <View style={styles.profileInfo}>
                   <Text style={styles.name}>{user?.displayName || "No Name"}</Text>
                   <Text style={styles.email}>{user?.email}</Text>
                   <View style={styles.memberSince}>
                     <Ionicons name="calendar" size={14} color="rgba(255,255,255,0.8)" />
-                    <Text style={styles.memberText}>{user?.metadata.creationTime? new Date(user.metadata.creationTime).toLocaleDateString('en-IN'):""}</Text>
+                    <Text style={styles.memberText}>Member since {getMemberSince()}</Text>
                   </View>
                 </View>
                 <TouchableOpacity 
@@ -262,9 +248,6 @@ export default function ProfileScreen() {
                       </Text>
                     </View>
                   )}
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.settingsBtn}>
-                  <Ionicons name="settings" size={20} color="rgba(255,255,255,0.8)" />
                 </TouchableOpacity>
               </View>
             </BlurView>
@@ -333,6 +316,7 @@ export default function ProfileScreen() {
           </Animated.View>
         )}
 
+      
         {/* Theme Toggle */}
         <Animated.View style={[
           styles.themeContainer,
@@ -406,6 +390,12 @@ export default function ProfileScreen() {
           </LinearGradient>
         </TouchableOpacity>
       </Animated.View>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        visible={showEditModal}
+        onClose={() => setShowEditModal(false)}
+      />
     </View>
   );
 }
