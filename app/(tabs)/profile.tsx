@@ -1,4 +1,5 @@
 import EditProfileModal from "@/src/components/profile/EditProfileModal";
+import Avatar from "@/src/components/ui/Avatar";
 import Skeleton from "@/src/components/ui/Skeleton";
 import { useTheme } from "@/src/context/themeContext";
 import { useAuth } from "@/src/hooks/useAuth";
@@ -15,7 +16,6 @@ import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
-  Image,
   Linking,
   ScrollView,
   StatusBar,
@@ -64,6 +64,14 @@ export default function ProfileScreen() {
     },
     { 
       id: '3', 
+      title: 'Send Feedback', 
+      subtitle: 'Help us improve the app',
+      icon: 'chatbubble-outline', 
+      color: '#4ECDC4',
+      action: () => router.push('/feedback')
+    },
+    { 
+      id: '4', 
       title: 'Help & Support', 
       subtitle: 'Get help or contact support',
       icon: 'help-circle', 
@@ -219,14 +227,11 @@ export default function ProfileScreen() {
                   styles.avatarContainer,
                   { transform: [{ scale: pulseAnim }] }
                 ]}>
-                  <Image
-                    source={{ uri: 'https://i.pravatar.cc/150?img=3' }}
-                    style={styles.avatar}
+                  <Avatar
+                    name={user?.displayName || user?.email || "?"}
+                    size={80}
                   />
                   <View style={styles.onlineIndicator} />
-                  {/* <TouchableOpacity style={styles.editAvatarBtn}>
-                    <Ionicons name="camera" size={16} color="#fff" />
-                  </TouchableOpacity> */}
                 </Animated.View>
                 <View style={styles.profileInfo}>
                   <Text style={styles.name}>{user?.displayName || "No Name"}</Text>
