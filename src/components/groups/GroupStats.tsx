@@ -1,8 +1,7 @@
-import { Animated, Text, View } from "react-native";
+import { styles } from "@/src/css/group.styles";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
-import { styles } from "@/src/css/group.styles";
-import groups from "@/app/(tabs)/groups";
+import { Animated, Text, View } from "react-native";
 
 type Group = {
   id: string;
@@ -13,12 +12,14 @@ type Group = {
 
 type Props = {
   groups: Group[];
+  activeGroupCount: number;
   fadeAnim: Animated.Value;
   scaleAnim: Animated.Value;
 };  
 
 export default function GroupStats({
   groups,
+  activeGroupCount,
   fadeAnim,
   scaleAnim,
 }: Props) {
@@ -37,7 +38,7 @@ export default function GroupStats({
         <BlurView intensity={10} tint="light" style={styles.statsContent}>
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{groups.length}</Text>
+              <Text style={styles.statValue}>{activeGroupCount}</Text>
               <Text style={styles.statLabel}>Active Groups</Text>
             </View>
 
