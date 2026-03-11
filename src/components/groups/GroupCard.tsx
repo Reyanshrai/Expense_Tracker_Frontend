@@ -1,4 +1,5 @@
 import CreateGroupModal from "@/src/components/groups/CreateGroupModal";
+import Avatar from "@/src/components/ui/Avatar";
 import { useTheme } from "@/src/context/themeContext";
 import { styles } from "@/src/css/group.styles";
 import { addMembersToGroup } from "@/src/services/group";
@@ -111,21 +112,41 @@ export default function GroupCard({
             </View>
           </View>
 
-          {/* 🔹 AVATARS */}
+          {/* 🔹 AVATARS - Using Initial Avatar Component */}
           <View style={styles.avatarContainer}>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.avatarScroll}
             >
-              {(group.avatars || []).map((avatar: string, idx: number) => (
+              {(group.participants || []).slice(0, 5).map((participant: any, idx: number) => (
                 <View
                   key={idx}
-                  style={[styles.avatar, { backgroundColor: `${group.color}15` }]}
+                  style={{ marginRight: -8 }}
                 >
-                  <Text style={styles.avatarEmoji}>{avatar}</Text>
+                  <Avatar
+                    name={participant.name || participant.email || `User ${idx + 1}`}
+                    size={36}
+                  />
                 </View>
               ))}
+              {(group.participants || []).length > 5 && (
+                <View
+                  style={[
+                    styles.avatar,
+                    {
+                      backgroundColor: `${group.color}30`,
+                      marginLeft: 4,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    },
+                  ]}
+                >
+                  <Text style={{ color: group.color, fontSize: 12, fontWeight: "700" }}>
+                    +{(group.participants || []).length - 5}
+                  </Text>
+                </View>
+              )}
             </ScrollView>
 
             <TouchableOpacity
