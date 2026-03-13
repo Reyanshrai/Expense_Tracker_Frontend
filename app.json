@@ -4,7 +4,7 @@
     "slug": "expense_tracker-frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/icon.png",
     "scheme": "expensetrackerfrontend",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
