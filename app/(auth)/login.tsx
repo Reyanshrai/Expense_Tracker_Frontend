@@ -19,7 +19,8 @@ import {
   View
 } from "react-native";
 import { styles } from '../../src/css/login.styles';
-import { loginWithEmail, loginWithGoogleWeb } from "../../src/services/auth";
+import { loginWithEmail } from "../../src/services/auth";
+import { useGoogleSignIn } from "../../src/services/googleAuth";
 
 const { width, height } = Dimensions.get('window');
 
@@ -87,17 +88,29 @@ export default function LoginScreen() {
     }
   };
 
-  /*Google login Function */
-
-  const handleGoogleLogin = async()=>{
-    try{
-      const cred = await loginWithGoogleWeb();
-      await createUserProfileIfNotExists(cred.user);  
-      router.replace("/(tabs)")
-    }catch(error:any){
-      Alert.alert("Google Login Failed", error.message)
+  /* Google Sign-In using expo-auth-session for mobile */
+  const { promptAsync: promptGoogleSignIn, loading: googleLoading } = useGoogleSignIn(
+    async (credential) => {
+      // Success callback - user signed in with Google
+      if (credential?.user) {
+        await createUserProfileIfNotExists(credential.user);
+        router.replace("/(tabs)");
+      }
+    },
+    (error) => {
+      // Error callback
+      console.error("Google Sign-In Error:", error);
+      Alert.alert("Google Login Failed", error.message || "Something went wrong");
     }
-  }
+  );
+
+  const handleGoogleLogin = async () => {
+    try {
+      await promptGoogleSignIn();
+    } catch (error: any) {
+      Alert.alert("Google Login Failed", error.message || "Failed to start Google Sign-In");
+    }
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -241,13 +254,16 @@ export default function LoginScreen() {
 
                 {/* Google Button */}
                 <TouchableOpacity
-                  style={styles.googleButton}
+                  style={[styles.googleButton, googleLoading && { opacity: 0.7 }]}
                   onPress={handleGoogleLogin}
                   activeOpacity={0.8}
+                  disabled={googleLoading}
                 >
                   <View style={styles.googleBlur}>
                     <AntDesign name="google" size={24} color="#fff" />
-                    <Text style={styles.googleText}>Continue with Google</Text>
+                    <Text style={styles.googleText}>
+                      {googleLoading ? "Loading..." : "Continue with Google"}
+                    </Text>
                   </View>
                 </TouchableOpacity>
 
