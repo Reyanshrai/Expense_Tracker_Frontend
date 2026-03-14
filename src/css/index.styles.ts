@@ -1,3 +1,4 @@
+import { normalize, safePadding } from '@/src/utils/responsive';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -12,15 +13,16 @@ export const styles = StyleSheet.create({
       bottom: 0,
     },
     scrollContent: {
-      paddingBottom: 140,
+      paddingBottom: normalize(140),
+      flexGrow: 1,
     },
     header: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      paddingHorizontal: 20,
-      paddingTop: 60,
-      marginBottom: 24,
+      paddingHorizontal: safePadding.horizontal,
+      paddingTop: safePadding.top,
+      marginBottom: normalize(24),
     },
     headerLeft: {
       flex: 1,
@@ -134,10 +136,10 @@ export const styles = StyleSheet.create({
       paddingHorizontal: 16,
     },
     categoryCard: {
-      width: 120,
-      padding: 16,
-      borderRadius: 20,
-      marginHorizontal: 4,
+      width: normalize(120),
+      padding: normalize(16),
+      borderRadius: normalize(20),
+      marginHorizontal: normalize(4),
       alignItems: 'center',
       backgroundColor: 'rgba(255, 255, 255, 0.05)',
       borderWidth: 1,
