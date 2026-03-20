@@ -47,29 +47,22 @@ export function useGroupSettlements(groupId: string | undefined) {
       where("groupId", "==", groupId),
     );
     onSnapshot(qTest, (testSnap) => {
-      console.log("🧪 TEST QUERY (no orderBy) count:", testSnap.docs.length);
       testSnap.docs.forEach((doc) => {
-        console.log("🧪 TEST DOC:", doc.id, doc.data());
+        doc.id, 
+        doc.data()
       });
     });
-
-    console.log("📡 Fetching settlements for groupId:", groupId);
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        console.log("📥 Settlement snapshot received, count:", snapshot.docs.length);
-        console.log("📥 Query:", q);
-        console.log("📥 Collection path:", collection(db, "groupSettlements").path);
         const data: Settlement[] = snapshot.docs.map((doc) => {
           const docData = doc.data();
-          console.log("📄 Settlement doc:", doc.id, docData);
           return {
             id: doc.id,
             ...(docData as Omit<Settlement, "id">),
           };
         });
-        console.log("✅ Processed settlements:", data);
         setSettlements(data);
         setLoading(false);
       },
