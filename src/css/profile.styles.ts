@@ -1,3 +1,4 @@
+import { borderRadius, fontSize, normalize, safePadding, spacing } from '@/src/utils/responsive';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -12,27 +13,27 @@ export const styles = StyleSheet.create({
       bottom: 0,
     },
     scrollContent: {
-      paddingBottom: 100,
+      paddingBottom: normalize(100),
     },
     headerContainer: {
-      paddingHorizontal: 20,
-      paddingTop: 60,
-      marginBottom: 32,
+      paddingHorizontal: safePadding.horizontal,
+      paddingTop: safePadding.top,
+      marginBottom: spacing.xl,
     },
     profileCard: {
-      borderRadius: 24,
+      borderRadius: borderRadius.xl,
       shadowColor: '#667eea',
       shadowOffset: {
         width: 0,
-        height: 12,
+        height: normalize(12),
       },
       shadowOpacity: 0.3,
-      shadowRadius: 20,
+      shadowRadius: normalize(20),
       elevation: 15,
     },
     profileContent: {
-      padding: 24,
-      borderRadius: 24,
+      padding: spacing.lg,
+      borderRadius: borderRadius.xl,
     },
     profileHeader: {
       flexDirection: 'row',
@@ -40,34 +41,34 @@ export const styles = StyleSheet.create({
     },
     avatarContainer: {
       position: 'relative',
-      marginRight: 16,
+      marginRight: spacing.md,
     },
     avatar: { 
-      width: 80, 
-      height: 80, 
-      borderRadius: 40,
+      width: normalize(80), 
+      height: normalize(80), 
+      borderRadius: borderRadius.full,
       borderWidth: 3,
       borderColor: 'rgba(255,255,255,0.3)',
     },
     onlineIndicator: {
       position: 'absolute',
-      bottom: 5,
-      right: 5,
-      width: 20,
-      height: 20,
-      borderRadius: 10,
+      bottom: normalize(5),
+      right: normalize(5),
+      width: normalize(20),
+      height: normalize(20),
+      borderRadius: borderRadius.full,
       backgroundColor: '#4ECDC4',
       borderWidth: 3,
       borderColor: '#fff',
     },
     editAvatarBtn: {
       position: 'absolute',
-      top: -5,
-      right: -5,
+      top: -normalize(5),
+      right: -normalize(5),
       backgroundColor: 'rgba(0,0,0,0.6)',
-      borderRadius: 15,
-      width: 30,
-      height: 30,
+      borderRadius: borderRadius.full,
+      width: normalize(30),
+      height: normalize(30),
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -75,16 +76,16 @@ export const styles = StyleSheet.create({
       flex: 1,
     },
     name: { 
-      fontSize: 24, 
+      fontSize: fontSize['2xl'], 
       fontWeight: '800',
       color: '#fff',
-      marginBottom: 4,
+      marginBottom: spacing.xs,
       letterSpacing: -0.5,
     },
     email: { 
-      fontSize: 16,
+      fontSize: fontSize.md,
       color: 'rgba(255,255,255,0.8)',
-      marginBottom: 8,
+      marginBottom: spacing.base,
       fontWeight: '500',
     },
     memberSince: {
@@ -92,9 +93,9 @@ export const styles = StyleSheet.create({
       alignItems: 'center',
     },
     memberText: {
-      fontSize: 14,
+      fontSize: fontSize.sm,
       color: 'rgba(255,255,255,0.8)',
-      marginLeft: 6,
+      marginLeft: spacing.xs,
       fontWeight: '500',
     },
     settingsBtn: {
@@ -287,7 +288,7 @@ export const styles = StyleSheet.create({
     },
     logoutContainer: {
       position: 'absolute',
-      bottom: 30,
+      bottom: 100, // Account for bottom tab bar (~60px) + padding
       left: 20,
       right: 20,
     },
@@ -318,5 +319,70 @@ export const styles = StyleSheet.create({
     },
     logoutEmoji: {
       fontSize: 16,
+    },
+    // Invitations Section Styles
+    invitationsContainer: {
+      paddingHorizontal: 20,
+      marginBottom: 24,
+    },
+    invitationsList: {
+      gap: 12,
+    },
+    invitationCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: 16,
+      borderRadius: 16,
+      overflow: 'hidden',
+    },
+    invitationInfo: {
+      flex: 1,
+    },
+    invitationGroupName: {
+      fontSize: 16,
+      fontWeight: '600',
+      marginBottom: 4,
+    },
+    invitationText: {
+      fontSize: 13,
+    },
+    acceptButton: {
+      backgroundColor: '#4ECDC4',
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 10,
+      marginLeft: 12,
+    },
+    acceptButtonDisabled: {
+      backgroundColor: '#9CA3AF',
+    },
+    acceptButtonText: {
+      color: '#fff',
+      fontWeight: '600',
+      fontSize: 14,
+    },
+    // Notification Button Styles
+    notificationBtn: {
+      position: 'relative',
+      padding: 8,
+      marginRight: 8,
+    },
+    notificationBadge: {
+      position: 'absolute',
+      top: 4,
+      right: 4,
+      backgroundColor: '#FF6B6B',
+      borderRadius: 10,
+      minWidth: 18,
+      height: 18,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 4,
+    },
+    notificationBadgeText: {
+      color: '#fff',
+      fontSize: 10,
+      fontWeight: '700',
     },
   });
