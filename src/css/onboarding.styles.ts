@@ -1,3 +1,4 @@
+import { normalize } from '@/src/utils/responsive';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -18,25 +19,25 @@ export const styles = StyleSheet.create({
       opacity: 0.1,
     },
     circle1: {
-      width: 200,
-      height: 200,
+      width: normalize(200),
+      height: normalize(200),
       backgroundColor: '#fff',
-      top: 100,
-      left: -50,
+      top: normalize(100),
+      left: -normalize(50),
     },
     circle2: {
-      width: 150,
-      height: 150,
+      width: normalize(150),
+      height: normalize(150),
       backgroundColor: '#FFE066',
-      top: 200,
-      right: -30,
+      top: normalize(200),
+      right: -normalize(30),
     },
     circle3: {
-      width: 100,
-      height: 100,
+      width: normalize(100),
+      height: normalize(100),
       backgroundColor: '#FF6B6B',
-      bottom: 150,
-      left: 50,
+      bottom: normalize(150),
+      left: normalize(50),
     },
     contentContainer: {
       flex: 1,
@@ -61,8 +62,8 @@ export const styles = StyleSheet.create({
       elevation: 10,
     },
     image: {
-      width: 200,
-      height: 200,
+      width: normalize(200),
+      height: normalize(200),
       resizeMode: 'contain',
     },
     textContainer: {
