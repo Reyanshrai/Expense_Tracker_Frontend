@@ -3,7 +3,6 @@ import { Settlement } from "@/src/types/group";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 
 export const addSettlement = async (settlement: Settlement) => {
-    console.log("📝 addSettlement called with:", settlement);
     
     if(!settlement.groupId || !settlement.from || !settlement.to || !settlement.amount || settlement.amount <= 0){
         console.error("❌ Missing required settlement fields", settlement);
@@ -15,7 +14,6 @@ export const addSettlement = async (settlement: Settlement) => {
             ...settlement,
             settledAt: Timestamp.now(),
         });
-        console.log("✅ Settlement saved with ID:", docRef.id);
     } catch (error) {
         console.error("❌ Error adding settlement:", error);
     }
