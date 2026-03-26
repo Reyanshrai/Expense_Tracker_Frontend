@@ -10,7 +10,8 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.expense-tracker-frontend"
+      "bundleIdentifier": "com.anonymous.expense-tracker-frontend",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,6 +29,12 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-auth-session",
+        {
+          "scheme": "expensetrackerfrontend"
+        }
+      ],
       [
         "expo-splash-screen",
         {
