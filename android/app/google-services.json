@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "369277120018",
+    "project_id": "expense-tracker-c78c3",
+    "storage_bucket": "expense-tracker-c78c3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369277120018:android:864eddd32b90840d3672cb",
+        "android_client_info": {
+          "package_name": "com.reyansh.expense_trackerfrontend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "369277120018-2d3odmnl01odcj66gn77i3hv20ipkh0n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhyzBpCKGB-YCvIftzIwTgsxNTX_Vt1ws"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "369277120018-2d3odmnl01odcj66gn77i3hv20ipkh0n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
